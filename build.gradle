@@ -1,7 +1,6 @@
 plugins {
     id 'org.springframework.boot' version '2.4.2'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'java'
     id 'application'
 }
 
@@ -15,6 +14,18 @@ repositories {
 
 ext {
     set('springBootAdminVersion', "2.3.1")
+}
+
+application {
+    mainClass = 'com.pochemuto.homealone.HomealoneApplication'
+}
+
+java {
+    modularity.inferModulePath = false
+}
+
+test {
+    useJUnitPlatform()
 }
 
 dependencies {
@@ -43,13 +54,5 @@ dependencyManagement {
     imports {
         mavenBom "de.codecentric:spring-boot-admin-dependencies:${springBootAdminVersion}"
     }
-}
-
-test {
-    useJUnitPlatform()
-}
-
-application {
-    mainClass = 'com.pochemuto.homealone.HomealoneApplication'
 }
 

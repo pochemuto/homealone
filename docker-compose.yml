@@ -1,0 +1,9 @@
+services:
+  home:
+    build: .
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+    image: home:1
+    container_name: home
+

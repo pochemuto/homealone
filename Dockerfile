@@ -1,18 +1,22 @@
-FROM gradle:6.8-jdk15 AS build
-WORKDIR /workspace
+FROM adoptopenjdk/openjdk15:alpine AS build
+WORKDIR workspace
 
 COPY gradle gradle
 COPY build.gradle .
 COPY settings.gradle .
-RUN gradle build --refresh-dependencies
+COPY gradlew .
+RUN ./gradlew build --refresh-dependencies
 COPY src src
 
-RUN gradle installDist
+RUN ./gradlew installBootDist
+RUN java -Djarmode=layertools -jar build/libs/*.jar extract
 
 FROM adoptopenjdk/openjdk15:alpine
-VOLUME /tmp
 
-COPY --from=build /workspace/build/install/homealone /app
+COPY --from=build workspace/dependencies/ .
+COPY --from=build workspace/snapshot-dependencies/ .
+COPY --from=build workspace/spring-boot-loader/ .
+COPY --from=build workspace/application/ .
 
-ENTRYPOINT ["/app/bin/homealone"]
+ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
 
