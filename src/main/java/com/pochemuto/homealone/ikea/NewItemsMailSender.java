@@ -3,11 +3,13 @@ package com.pochemuto.homealone.ikea;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class NewItemsMailSender implements IkeaListener {
 
@@ -25,5 +27,6 @@ public class NewItemsMailSender implements IkeaListener {
         msg.setText(text);
 
         mailSender.send(msg);
+        log.info("Message sent");
     }
 }
