@@ -6,4 +6,19 @@ services:
     restart: unless-stopped
     image: home:1
     container_name: home
+    networks:
+      - nu
 
+networks:
+  nu:
+    enable_ipv6: true
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "true"
+    ipam:
+      driver: default
+      config:
+       - subnet: 172.16.238.0/24
+         gateway: 172.16.238.1
+       - subnet: 2001:3984:3989::/64
+         gateway: 2001:3984:3989::1
