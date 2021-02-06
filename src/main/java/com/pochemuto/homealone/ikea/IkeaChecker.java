@@ -2,6 +2,7 @@ package com.pochemuto.homealone.ikea;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,7 +78,7 @@ public class IkeaChecker {
     }
 
     public static BigDecimal parsePrice(String price) {
-        return new BigDecimal(price.replaceAll(" ", ""));
+        return new BigDecimal(price.replaceAll(" ", "")).setScale(2, RoundingMode.CEILING);
     }
 }
 

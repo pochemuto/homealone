@@ -7,7 +7,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableAdminServer
-@EnableScheduling
 public class HomealoneApplication {
 
     public static void main(String[] args) {

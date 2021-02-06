@@ -5,4 +5,5 @@ public class Profile {
     }
 
     public static final String TEST  = "test";
+    public static final String INTEGRATION_TEST  = "integration-test";
 }

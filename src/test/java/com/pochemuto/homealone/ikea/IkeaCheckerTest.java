@@ -9,8 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class IkeaCheckerTest {
     @ParameterizedTest
-    @CsvSource(value = "18 999")
+    @CsvSource(value = "18 999,18999.00,18999.001")
     void price(String value) {
-        assertThat(IkeaChecker.parsePrice(value)).isEqualTo(new BigDecimal("18999"));
+        assertThat(IkeaChecker.parsePrice(value)).isEqualTo(new BigDecimal("18999.00"));
     }
 }
