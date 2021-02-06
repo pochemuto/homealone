@@ -17,11 +17,11 @@ public class NewItemsMailSender implements IkeaListener {
     private JavaMailSender mailSender;
 
     @Override
-    public void onNewItems(List<Item> items) {
+    public void onItemsChanged(List<Item> added, List<Item> removed) {
         var msg = new SimpleMailMessage();
         msg.setTo("pochemuto@gmail.com");
-        msg.setSubject("Обнаружено %s новых товаров!".formatted(items.size()));
-        var text = items.stream()
+        msg.setSubject("Обнаружено %s новых товаров!".formatted(added.size()));
+        var text = added.stream()
                 .map(item -> item.getName() + " : " + item.getPrice() + "руб.")
                 .collect(Collectors.joining("\n"));
         msg.setText(text);

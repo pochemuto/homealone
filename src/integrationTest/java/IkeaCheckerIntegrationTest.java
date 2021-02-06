@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.List;
 
 import com.pochemuto.homealone.HomealoneApplication;
 import com.pochemuto.homealone.Profile;
@@ -8,16 +9,19 @@ import com.pochemuto.homealone.ikea.ItemRepository;
 import com.pochemuto.homealone.ikea.NewItemsMailSender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
 import static com.pochemuto.homealone.util.CustomArgumentMatchers.notEmpty;
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
@@ -64,18 +68,23 @@ class IkeaCheckerIntegrationTest {
                 .extracting(Item::isReduced)
                 .contains(true, false);
 
-        verify(mailSender).onNewItems(items);
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<Item>> addedCaptor = ArgumentCaptor.forClass(List.class);
+
+        verify(mailSender).onItemsChanged(addedCaptor.capture(), eq(emptyList()));
+        assertThat(addedCaptor.getValue()).containsExactlyInAnyOrderElementsOf(items);
     }
+
 
     @Test
     void rollbackTransactionOnListenerFail() {
         var exception = new RuntimeException("error happened");
 
-        doThrow(exception).when(mailSender).onNewItems(any());
+        doThrow(exception).when(mailSender).onItemsChanged(any(), any());
 
         assertThatThrownBy(() -> ikeaChecker.check()).isSameAs(exception);
 
-        verify(mailSender).onNewItems(argThat(notEmpty()));
+        verify(mailSender).onItemsChanged(argThat(notEmpty()), any());
 
         assertThat(itemRepository.count()).isZero();
     }
