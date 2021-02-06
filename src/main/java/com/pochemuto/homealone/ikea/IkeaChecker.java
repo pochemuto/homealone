@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -35,17 +36,7 @@ public class IkeaChecker {
         var known = itemRepository.findNames();
         log.info("Known {} items: {}", known.size(), known);
 
-        log.info("Checking {}", URL);
-        Document page = Jsoup.connect(URL).get();
-
-        Instant now = Instant.now();
-        List<Item> items = page.select(".range-revamp-compact-price-package")
-                .stream()
-                .map(this::parse)
-                .peek(item -> item.setLastSeen(now))
-                .collect(Collectors.toList());
-
-        log.info("Found {} items: {}", items.size(), items);
+        var items = getActual();
 
         itemRepository.saveAll(items);
 
@@ -80,5 +71,22 @@ public class IkeaChecker {
     public static BigDecimal parsePrice(String price) {
         return new BigDecimal(price.replaceAll(" ", "")).setScale(2, RoundingMode.CEILING);
     }
+
+    public List<Item> getActual() throws IOException {
+        log.info("Checking {}", URL);
+        Document page = Jsoup.connect(URL).get();
+
+        Instant now = Instant.now();
+
+        List<Item> items = page.select(".range-revamp-compact-price-package")
+                .stream()
+                .map(this::parse)
+                .peek(item -> item.setLastSeen(now))
+                .collect(Collectors.toList());
+
+        log.info("Found {} items: {}", items.size(), items);
+        return items;
+    }
+
 }
 
