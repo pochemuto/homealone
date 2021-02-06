@@ -3,6 +3,8 @@ services:
     build: .
     volumes:
       - ./data:/data
+    ports:
+      - 80:8080
     restart: unless-stopped
     image: home:1
     container_name: home
