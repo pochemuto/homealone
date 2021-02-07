@@ -2,7 +2,7 @@ services:
   home:
     build: .
     volumes:
-      - ./data:/data
+      - /etc/pochemuto/homealone/data:/data
     ports:
       - 80:8080
     secrets:
@@ -15,7 +15,7 @@ services:
 
 secrets:
   secret-properties:
-    file: ./secret.properties
+    file: /etc/pochemuto/homealone/secret.properties
 
 networks:
   nu:
