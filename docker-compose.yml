@@ -3,14 +3,13 @@ services:
     build: .
     volumes:
       - /etc/pochemuto/homealone/data:/data
-    ports:
-      - 80:8080
     secrets:
       - secret-properties
     restart: on-failure
     image: home:1
     container_name: home
     networks:
+      - spring-boot-admin
       - nu
 
 secrets:
@@ -18,6 +17,9 @@ secrets:
     file: /etc/pochemuto/homealone/secret.properties
 
 networks:
+  spring-boot-admin:
+    external: true
+
   nu:
     enable_ipv6: true
     driver: bridge
@@ -28,5 +30,7 @@ networks:
       config:
        - subnet: 172.16.238.0/24
          gateway: 172.16.238.1
-       - subnet: 2001:3984:3989::/64
-         gateway: 2001:3984:3989::1
+         # нужно добавить в файрвол
+         # sudo ip6tables -t nat -A POSTROUTING -s 2001:1000:1000::/64 ! -o docker0 -j MASQUERADE
+       - subnet: 2001:1000:1000::/64
+         gateway: 2001:1000:1000::1
