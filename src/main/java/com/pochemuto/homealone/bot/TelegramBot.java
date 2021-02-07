@@ -15,6 +15,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import static java.util.Comparator.comparing;
+
 @Slf4j
 @Component
 public class TelegramBot extends TelegramLongPollingBot implements IkeaListener {
@@ -75,9 +77,11 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
 
     private String formatItems(List<Item> items) {
         var sb = new StringBuilder();
-        for (Item item : items) {
-            sb.append("• ").append(item.getName()).append(": `").append(item.getPrice()).append("`\n");
-        }
+        items.stream()
+                .sorted(comparing(Item::getPrice).reversed().thenComparing(Item::getName))
+                .forEach(item ->
+                        sb.append("• ").append(item.getName()).append(": `").append(item.getPrice()).append("`\n")
+                );
         return sb.toString();
     }
 
