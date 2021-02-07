@@ -5,11 +5,17 @@ services:
       - ./data:/data
     ports:
       - 80:8080
-    restart: unless-stopped
+    secrets:
+      - secret-properties
+    restart: on-failure
     image: home:1
     container_name: home
     networks:
       - nu
+
+secrets:
+  secret-properties:
+    file: ./secret.properties
 
 networks:
   nu:
