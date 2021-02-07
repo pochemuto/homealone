@@ -59,11 +59,11 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
     private void ikea(Update update) {
         long chatId = update.getMessage().getChatId();
         try {
-            meetUser(update);
             Integer requestingMessageId = sendMessage(chatId, "Смотрим...");
             if (requestingMessageId == null) {
                 return;
             }
+            meetUser(update);
             var items = ikeaChecker.getActual();
             sendApiMethod(EditMessageText.builder()
                     .messageId(requestingMessageId)
