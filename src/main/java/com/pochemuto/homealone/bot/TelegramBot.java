@@ -3,6 +3,8 @@ package com.pochemuto.homealone.bot;
 import java.io.IOException;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.pochemuto.homealone.ikea.IkeaChecker;
 import com.pochemuto.homealone.ikea.IkeaListener;
 import com.pochemuto.homealone.ikea.Item;
@@ -12,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -53,12 +57,23 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
     }
 
     private void ikea(Update update) {
+        long chatId = update.getMessage().getChatId();
         try {
             meetUser(update);
+            Integer requestingMessageId = sendMessage(chatId, "Смотрим...");
+            if (requestingMessageId == null) {
+                return;
+            }
             var items = ikeaChecker.getActual();
-            sendMessage(update.getMessage().getChatId(), formatItems(items));
-        } catch (IOException e) {
-            handleError(update.getMessage().getChatId(), e);
+            sendApiMethod(EditMessageText.builder()
+                    .messageId(requestingMessageId)
+                    .chatId(String.valueOf(chatId))
+                    .text(formatItems(items))
+                    .parseMode("markdown")
+                    .build()
+            );
+        } catch (IOException | TelegramApiException e) {
+            handleError(chatId, e);
         }
     }
 
@@ -90,17 +105,20 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
         sendMessage(chatId, "*Произошла ошибка:* " + e);
     }
 
-    private void sendMessage(long chatId, String text) {
+    @Nullable
+    private Integer sendMessage(long chatId, String text) {
         try {
-            sendApiMethod(SendMessage.builder()
+            Message response = sendApiMethod(SendMessage.builder()
                     .chatId(String.valueOf(chatId))
                     .text(text)
                     .parseMode("markdown")
                     .build()
             );
+            return response.getMessageId();
         } catch (TelegramApiException telegramApiException) {
             log.error("Cannot send reply", telegramApiException);
         }
+        return null;
     }
 
     @Override
