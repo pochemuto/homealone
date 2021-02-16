@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 import com.pochemuto.homealone.ikea.IkeaChecker;
 import com.pochemuto.homealone.ikea.IkeaListener;
 import com.pochemuto.homealone.ikea.Item;
-import com.pochemuto.homealone.spring.ApplicationProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,7 +25,7 @@ import static java.util.Comparator.comparing;
 public class TelegramBot extends TelegramLongPollingBot implements IkeaListener {
 
     @Autowired
-    private ApplicationProperties properties;
+    private BotProperties properties;
 
     @Autowired
     private UserRepository userRepository;
@@ -37,12 +36,12 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
     //region Settings
     @Override
     public String getBotUsername() {
-        return properties.getBot().getUsername();
+        return properties.getUsername();
     }
 
     @Override
     public String getBotToken() {
-        return properties.getBot().getToken();
+        return properties.getToken();
     }
     //endregion
 

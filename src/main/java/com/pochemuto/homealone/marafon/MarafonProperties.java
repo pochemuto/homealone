@@ -1,11 +1,13 @@
-package com.pochemuto.homealone.spring;
+package com.pochemuto.homealone.marafon;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Data
-@ConfigurationProperties("application")
+@ConfigurationProperties("marafon")
 @Component
-public class ApplicationProperties {
+public class MarafonProperties {
+    private String login;
+    private String password;
 }
