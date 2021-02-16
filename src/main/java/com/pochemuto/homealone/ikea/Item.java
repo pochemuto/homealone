@@ -3,15 +3,12 @@ package com.pochemuto.homealone.ikea;
 import java.math.BigDecimal;
 import java.time.Instant;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
 @Data
+@Document
 public class Item {
     @Id
     String name;

@@ -81,8 +81,7 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
         var chatId = update.getMessage().getChat().getId();
         var userName = update.getMessage().getFrom().getUserName();
         var user = User.builder()
-                .id(userId.longValue())
-                .chatId(chatId)
+                .id(new User.Key(userId.longValue(), chatId))
                 .login(userName)
                 .build();
 
@@ -135,13 +134,13 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
         for (User user : users) {
             try {
                 sendApiMethod(SendMessage.builder()
-                        .chatId(String.valueOf(user.getChatId()))
+                        .chatId(String.valueOf(user.getId().getChatId()))
                         .parseMode("markdown")
                         .text(text)
                         .build()
                 );
             } catch (TelegramApiException e) {
-                handleError(user.getChatId(), e);
+                handleError(user.getId().getChatId(), e);
             }
         }
     }

@@ -79,15 +79,10 @@ public class MarafonParser {
                 .build()
                 .toUriString();
 
-        var meals = parseFood(getPage(url));
-        meals.forEach(m -> {
-                    m.setWeek(week);
-                    m.setDay(day);
-                });
-        return meals;
+        return parseFood(getPage(url), week, day);
     }
 
-    private List<Meal> parseFood(Document page) {
+    private List<Meal> parseFood(Document page, int week, DayOfWeek day) {
         Elements mealElements = page.select(".food_list .food_item");
         List<Meal> meals = new ArrayList<>();
         int num = 0;
@@ -106,10 +101,9 @@ public class MarafonParser {
                 ingredients.add(ingredient);
             }
 
-
             var meal = new Meal();
+            meal.setId(new Meal.Key(week, day, num++));
             meal.setTitle(title);
-            meal.setNum(num++);
             meal.setIngredients(ingredients);
             meal.setCooking(mealElement.select(".cooking p").text());
 

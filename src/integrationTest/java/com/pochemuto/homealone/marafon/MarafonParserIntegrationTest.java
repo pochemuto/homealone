@@ -33,6 +33,7 @@ class MarafonParserIntegrationTest {
         List<Meal> meals = parser.getFood(1, DayOfWeek.MONDAY);
         System.out.println(meals);
         repository.saveAll(meals);
+        repository.saveAll(parser.getFood(1, DayOfWeek.TUESDAY));
 
         var load = repository.findAll();
         System.out.println(load);

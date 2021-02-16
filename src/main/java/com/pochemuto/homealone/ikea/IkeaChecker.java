@@ -4,11 +4,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import javax.transaction.Transactional;
 
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +34,6 @@ public class IkeaChecker {
     private List<IkeaListener> listeners;
 
     @Scheduled(fixedDelay = 30 * 60 * 1000)
-    @Transactional
     public void check() throws IOException {
         var known = itemRepository.findAll()
                 .stream()
@@ -44,8 +42,6 @@ public class IkeaChecker {
         log.info("Known {} items: {}", known.size(), display(known.values()));
 
         var items = getActual();
-
-        itemRepository.saveAll(items);
 
         var actual = items.stream()
                 .collect(toMap(Item::getName, identity()));
@@ -65,6 +61,7 @@ public class IkeaChecker {
             log.info("No difference found");
         }
 
+        itemRepository.saveAll(items);
     }
 
     private static String display(Collection<Item> items) {
@@ -94,7 +91,7 @@ public class IkeaChecker {
         log.info("Checking {}", URL);
         Document page = Jsoup.connect(URL).get();
 
-        Instant now = Instant.now();
+        Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
         List<Item> items = page.select(".range-revamp-compact-price-package")
                 .stream()

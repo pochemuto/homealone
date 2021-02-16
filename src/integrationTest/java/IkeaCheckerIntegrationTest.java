@@ -56,7 +56,9 @@ class IkeaCheckerIntegrationTest {
                         "HJÄLPSAM ЭЛЬПСАМ",
                         "LAGAN ЛАГАН",
                         "SKINANDE СКИНАНДЕ",
-                        "HYGIENISK ХИГИЕНИСК"
+                        "HYGIENISK ХИГИЕНИСК",
+                        "PROFFSIG ПРОФФСИГ",
+                        "DISKAD ДИСКАД"
                 );
 
         assertThat(items)
@@ -77,7 +79,7 @@ class IkeaCheckerIntegrationTest {
 
 
     @Test
-    void rollbackTransactionOnListenerFail() {
+    void dontSaveIfListenerFailed() {
         var exception = new RuntimeException("error happened");
 
         doThrow(exception).when(mailSender).onItemsChanged(any(), any());

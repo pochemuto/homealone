@@ -4,43 +4,28 @@ import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.OneToMany;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Entity
-@IdClass(Meal.ID.class)
+@Document
 public class Meal {
 
     @Id
-    private int week;
-    @Id
-    private DayOfWeek day;
-    @Id
-    private int num;
-
+    private Key id;
     private String title;
     private String cooking;
 
-    @OneToMany(
-            cascade = CascadeType.ALL,
-            fetch = FetchType.EAGER
-    )
     private List<Ingredient> ingredients;
 
-    @Data
-    public static class ID implements Serializable {
-        @Id
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Key implements Serializable {
         private int week;
-        @Id
         private DayOfWeek day;
-        @Id
         private int num;
     }
 }

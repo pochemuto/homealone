@@ -1,26 +1,31 @@
 package com.pochemuto.homealone.bot;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
+import java.io.Serializable;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@IdClass(UserId.class)
+@Document
 public class User {
     @Id
-    Long id;
+    private Key id;
 
-    @Id
-    Long chatId;
+    private String login;
 
-    String login;
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Key implements Serializable {
+        Long id;
+
+        Long chatId;
+    }
 }
