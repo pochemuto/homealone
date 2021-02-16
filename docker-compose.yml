@@ -1,8 +1,6 @@
 services:
   home:
     build: .
-    volumes:
-      - /etc/pochemuto/homealone/data:/data
     secrets:
       - secret-properties
     restart: on-failure
@@ -12,8 +10,17 @@ services:
       - spring-boot-admin
       - nu
 
+  mongo:
+    image: mongo:4.0-xenial
+    restart: always
+    volumes:
+      - /etc/pochemuto/homealone/mongo:/data/db
+    networks:
+      - nu
+
 secrets:
   secret-properties:
+    # должны находиться на машине, на которой запущена docker-machine
     file: /etc/pochemuto/homealone/secret.properties
 
 networks:

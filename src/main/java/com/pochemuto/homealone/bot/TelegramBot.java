@@ -2,8 +2,10 @@ package com.pochemuto.homealone.bot;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 import javax.annotation.Nullable;
+import javax.annotation.PostConstruct;
 
 import com.pochemuto.homealone.ikea.IkeaChecker;
 import com.pochemuto.homealone.ikea.IkeaListener;
@@ -32,6 +34,14 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
 
     @Autowired
     private IkeaChecker ikeaChecker;
+
+    @PostConstruct
+    public void postConstruct() {
+        log.info("Registering as bot {} with token {}",
+                getBotUsername(),
+                Objects.requireNonNullElse(getBotToken(), "null").substring(0, 4)
+        );
+    }
 
     //region Settings
     @Override
