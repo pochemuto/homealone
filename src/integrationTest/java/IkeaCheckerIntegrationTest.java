@@ -73,7 +73,7 @@ class IkeaCheckerIntegrationTest {
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<Item>> addedCaptor = ArgumentCaptor.forClass(List.class);
 
-        verify(mailSender).onItemsChanged(addedCaptor.capture(), eq(emptyList()));
+        verify(mailSender).onItemsChanged(addedCaptor.capture(), eq(emptyList()), eq(emptyList()));
         assertThat(addedCaptor.getValue()).containsExactlyInAnyOrderElementsOf(items);
     }
 
@@ -82,11 +82,11 @@ class IkeaCheckerIntegrationTest {
     void dontSaveIfListenerFailed() {
         var exception = new RuntimeException("error happened");
 
-        doThrow(exception).when(mailSender).onItemsChanged(any(), any());
+        doThrow(exception).when(mailSender).onItemsChanged(any(), any(), any());
 
         assertThatThrownBy(() -> ikeaChecker.check()).isSameAs(exception);
 
-        verify(mailSender).onItemsChanged(argThat(notEmpty()), any());
+        verify(mailSender).onItemsChanged(argThat(notEmpty()), any(), any());
 
         assertThat(itemRepository.count()).isZero();
     }

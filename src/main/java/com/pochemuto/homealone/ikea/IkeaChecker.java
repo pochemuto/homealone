@@ -7,8 +7,12 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
+
+import com.google.common.base.Equivalence;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -46,16 +50,29 @@ public class IkeaChecker {
         var actual = items.stream()
                 .collect(toMap(Item::getName, identity()));
 
-        var difference = Maps.difference(actual, known);
+        var difference = Maps.difference(actual, known, new Equivalence<>() {
+            @Override
+            protected boolean doEquivalent(@Nonnull Item a, @Nonnull Item b) {
+                return Objects.equals(a.getName(), b.getName())
+                        && Objects.equals(a.getPrice(), b.getPrice());
+            }
+
+            @Override
+            protected int doHash(@Nonnull Item item) {
+                return Objects.hash(item.getName(), item.getPrice());
+            }
+        });
+
 
         if (!difference.areEqual()) {
-            log.info("Found difference, new names: {}, removed: {}",
-                    difference.entriesOnlyOnLeft(), difference.entriesOnlyOnRight());
+            log.info("Found difference, new names: {}, removed: {}, changed: {}",
+                    difference.entriesOnlyOnLeft(), difference.entriesOnlyOnRight(), difference.entriesDiffering());
 
             for (IkeaListener listener : listeners) {
                 var added = List.copyOf(difference.entriesOnlyOnLeft().values());
                 var removed = List.copyOf(difference.entriesOnlyOnRight().values());
-                listener.onItemsChanged(added, removed);
+                var changed = List.copyOf(difference.entriesDiffering().values());
+                listener.onItemsChanged(added, removed, changed);
             }
         } else {
             log.info("No difference found");

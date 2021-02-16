@@ -1,12 +1,14 @@
 package com.pochemuto.homealone.bot;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 
+import com.google.common.collect.MapDifference.ValueDifference;
 import com.pochemuto.homealone.ikea.IkeaChecker;
 import com.pochemuto.homealone.ikea.IkeaListener;
 import com.pochemuto.homealone.ikea.Item;
@@ -98,13 +100,37 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
         userRepository.save(user);
     }
 
-    private String formatItems(List<Item> items) {
+    private static Comparator<Item> itemsComparator() {
+        return comparing(Item::getPrice).reversed().thenComparing(Item::getName);
+    }
+
+    private static String formatItems(List<Item> items) {
         var sb = new StringBuilder();
         items.stream()
-                .sorted(comparing(Item::getPrice).reversed().thenComparing(Item::getName))
-                .forEach(item ->
-                        sb.append("• ").append(item.getName()).append(": `").append(item.getPrice()).append("`\n")
-                );
+                .sorted(itemsComparator())
+                .forEach(item -> {
+                    sb.append("• ");
+                    formatItem(sb, item);
+                    sb.append("\n");
+                });
+        return sb.toString();
+    }
+
+    private static void formatItem(StringBuilder sb, Item item) {
+        sb.append(item.getName()).append(": `").append(item.getPrice()).append("`");
+    }
+
+    private String formatChanged(List<ValueDifference<Item>> changed) {
+        StringBuilder sb = new StringBuilder();
+        changed.stream()
+                .sorted(Comparator.comparing(ValueDifference::leftValue, itemsComparator()))
+                .forEach(c -> {
+                    sb.append("• ");
+                    formatItem(sb, c.leftValue());
+                    sb.append(" ➝ ");
+                    formatItem(sb, c.rightValue());
+                    sb.append("\n");
+                });
         return sb.toString();
     }
 
@@ -130,13 +156,16 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
     }
 
     @Override
-    public void onItemsChanged(List<Item> added, List<Item> removed) {
+    public void onItemsChanged(List<Item> added, List<Item> removed, List<ValueDifference<Item>> changed) {
         var sb = new StringBuilder();
         if (!added.isEmpty()) {
             sb.append("*Новые товары:*\n").append(formatItems(added));
         }
         if (!removed.isEmpty()) {
             sb.append("*Исчезнувшие товары:*\n").append(formatItems(removed));
+        }
+        if (!changed.isEmpty()) {
+            sb.append("*Изменившиеся товары:*\n").append(formatChanged(changed));
         }
         var users = userRepository.findAll();
         var text = sb.toString();
