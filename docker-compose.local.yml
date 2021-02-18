@@ -7,3 +7,16 @@ services:
     ports:
       - 27019:27017
 
+  selenium:
+    image: selenium/standalone-chrome:88.0
+    restart: always
+    shm_size: 2gb
+    environment:
+      - SCREEN_WIDTH=1170
+      - SCREEN_HEIGHT=2532
+      - SCREEN_DEPTH=24
+      - SCREEN_DPI=460
+    ports:
+      - 4444:4444
+
+
