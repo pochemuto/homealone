@@ -8,4 +8,10 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("application")
 @Component
 public class ApplicationProperties {
+    private Scheduling scheduling;
+
+    @Data
+    public static class Scheduling {
+        boolean enabled;
+    }
 }
