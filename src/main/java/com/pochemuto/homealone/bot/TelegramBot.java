@@ -60,11 +60,18 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            var text = update.getMessage().getText();
+            var text = update.getMessage().getText().toLowerCase().strip();
             switch (text) {
                 case "/ikea", "/икея" -> ikea(update);
+                case "ping" -> ping(update);
             }
         }
+    }
+
+    private void ping(Update update) {
+        log.info("Sending pong");
+        sendMessage(update.getMessage().getChatId(), "pong");
+        log.info("Pong!");
     }
 
     private void ikea(Update update) {

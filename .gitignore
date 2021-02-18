@@ -1,4 +1,5 @@
 secret.properties
+data/
 
 HELP.md
 .gradle
