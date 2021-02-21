@@ -8,11 +8,14 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
 import com.google.common.base.Equivalence;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -30,6 +33,7 @@ import static java.util.stream.Collectors.toMap;
 @Component
 public class IkeaChecker {
     private static final String URL = "https://www.ikea.com/ru/ru/cat/posudomoechnye-mashiny-20825/";
+    private static final Pattern ID_PATTERN = Pattern.compile("(?<id>\\d+)/$");
 
     @Autowired
     private ItemRepository itemRepository;
@@ -41,25 +45,26 @@ public class IkeaChecker {
     public void check() throws IOException {
         var known = itemRepository.findAll()
                 .stream()
-                .collect(toMap(Item::getName, identity()));
+                .collect(toMap(Item::getId, identity()));
 
         log.info("Known {} items: {}", known.size(), display(known.values()));
 
         var items = getActual();
 
         var actual = items.stream()
-                .collect(toMap(Item::getName, identity()));
+                .collect(toMap(Item::getId, identity()));
 
         var difference = Maps.difference(actual, known, new Equivalence<>() {
             @Override
             protected boolean doEquivalent(@Nonnull Item a, @Nonnull Item b) {
-                return Objects.equals(a.getName(), b.getName())
+                return Objects.equals(a.getId(), b.getId())
+                        && Objects.equals(a.getName(), b.getName())
                         && Objects.equals(a.getPrice(), b.getPrice());
             }
 
             @Override
             protected int doHash(@Nonnull Item item) {
-                return Objects.hash(item.getName(), item.getPrice());
+                return Objects.hash(item.getId(), item.getName(), item.getPrice());
             }
         });
 
@@ -94,6 +99,7 @@ public class IkeaChecker {
 
     private Item parse(Element element) {
         var item = new Item();
+        item.setId(parseId(element.selectFirst("a").attr("href")));
         item.setName(element.selectFirst(".range-revamp-header-section__title--small").text());
         item.setPrice(parsePrice(element.selectFirst(".range-revamp-price__integer").text()));
         item.setReduced(!element.select(".range-revamp-compact-price-package__last-chance").isEmpty());
@@ -104,13 +110,20 @@ public class IkeaChecker {
         return new BigDecimal(price.replaceAll(" ", "")).setScale(2, RoundingMode.CEILING);
     }
 
+    public static int parseId(String href) {
+        Matcher matcher = ID_PATTERN.matcher(href);
+        boolean found = matcher.find();
+        Preconditions.checkState(found, "id not found in %s", href);
+        return Integer.parseInt(matcher.group("id"));
+    }
+
     public List<Item> getActual() throws IOException {
         log.info("Checking {}", URL);
         Document page = Jsoup.connect(URL).get();
 
         Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-        List<Item> items = page.select(".range-revamp-compact-price-package")
+        List<Item> items = page.select(".range-revamp-product-compact__bottom-wrapper")
                 .stream()
                 .map(this::parse)
                 .peek(item -> item.setLastSeen(now))

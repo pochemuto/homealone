@@ -55,6 +55,7 @@ class IkeaCheckerIntegrationTest {
                 .containsExactlyInAnyOrder(
                         "HJÄLPSAM ЭЛЬПСАМ",
                         "LAGAN ЛАГАН",
+                        "LAGAN ЛАГАН",
                         "SKINANDE СКИНАНДЕ",
                         "HYGIENISK ХИГИЕНИСК",
                         "PROFFSIG ПРОФФСИГ",

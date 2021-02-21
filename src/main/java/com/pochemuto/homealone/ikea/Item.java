@@ -8,9 +8,11 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Document
+@Document(collection = "ikea")
 public class Item {
     @Id
+    int id;
+
     String name;
 
     BigDecimal price;
