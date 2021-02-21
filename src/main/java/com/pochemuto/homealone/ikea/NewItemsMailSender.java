@@ -20,6 +20,10 @@ public class NewItemsMailSender implements IkeaListener {
 
     @Override
     public void onItemsChanged(List<Item> added, List<Item> removed, List<ValueDifference<Item>> change) {
+        if (added.isEmpty()) {
+            log.info("Skip sending message, no added items found");
+            return;
+        }
         var msg = new SimpleMailMessage();
         msg.setTo("pochemuto@gmail.com");
         msg.setSubject("Обнаружено %s новых товаров!".formatted(added.size()));
