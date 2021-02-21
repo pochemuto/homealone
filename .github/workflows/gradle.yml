@@ -22,5 +22,7 @@ jobs:
         java-version: 15
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Mock secret.properties
+      run: touch secret.properties
     - name: Build with Gradle
       run: ./gradlew build
