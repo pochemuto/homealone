@@ -22,6 +22,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +33,7 @@ import static java.util.stream.Collectors.toMap;
 
 @Slf4j
 @Component
+@CacheConfig(cacheNames = "ikea")
 public class IkeaChecker {
     private static final String URL = "https://www.ikea.com/ru/ru/cat/posudomoechnye-mashiny-20825/";
     private static final Pattern ID_PATTERN = Pattern.compile("(?<id>\\d+)/$");
@@ -117,6 +120,7 @@ public class IkeaChecker {
         return Integer.parseInt(matcher.group("id"));
     }
 
+    @Cacheable
     public List<Item> getActual() throws IOException {
         log.info("Checking {}", URL);
         Document page = Jsoup.connect(URL).get();
