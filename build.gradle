@@ -65,9 +65,12 @@ idea {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.2.0'
+
+    // cache
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine:2.8.8'
 
     // spring boot admin
     implementation 'org.springframework.boot:spring-boot-starter-web-services'
