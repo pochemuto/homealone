@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Preconditions;
@@ -24,7 +25,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MafaronScraper {
 
-    private static final File IMG_FILE = Path.of(System.getProperty("user.home"), "Desktop", "img " + LocalDateTime.now().toString() + ".png").toFile();
+    private static final File IMG_FILE = Path.of("C:\\Users\\Кирилл\\Desktop\\" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".png").toFile();
     private static final String SELENIUM_URL = "http://localhost:4444/wd/hub";
     @Autowired
     private MarafonProperties properties;
@@ -48,7 +49,7 @@ public class MafaronScraper {
         driver.navigate().to("https://lk.lerchekmarafon.ru/marafon/food?week=1&number=2");
 
         driver.manage().window().maximize();
-        takeScreenshot(driver);
+       takeScreenshot(driver);
 
         System.out.println(driver.getTitle());
         var cookies = driver.manage().getCookies();
@@ -60,9 +61,9 @@ public class MafaronScraper {
 
         File file = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
         WebElement element = driver.findElement(By.cssSelector("div.food_list > div:nth-child(3)"));
-//
+
         boolean moved = file.renameTo(IMG_FILE);
-        Preconditions.checkState(moved);
+       Preconditions.checkState(moved);
         System.out.println(file.getAbsolutePath());
     }
 }

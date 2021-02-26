@@ -8,7 +8,7 @@ import org.openqa.selenium.support.PageFactory;
 public class LoginPage {
     private final WebDriver driver;
 
-    @FindBy(css = "#login-form")
+    @FindBy(xpath = "#login-form")
     private WebElement form;
 
     @FindBy(css = "#loginform-email")
