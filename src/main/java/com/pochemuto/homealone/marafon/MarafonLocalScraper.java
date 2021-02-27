@@ -28,8 +28,8 @@ public class MarafonLocalScraper {
         personalAccountPage.openPage("https://lk.lerchekmarafon.ru/");
         personalAccountPage.windowMaximize();
 
-        personalAccountPage.populateLoginNameField("pochemuto@gmail.com");
-        personalAccountPage.populateLoginPasswordField("thebest1121");
+        personalAccountPage.populateLoginNameField("*****");
+        personalAccountPage.populateLoginPasswordField("***");
         personalAccountPage.submitLoginForm();
         WaitUtils.waitABit(1000);
         personalAccountPage.openPage(personalAccountPage.generateFoodPageUrl(1, 2));
