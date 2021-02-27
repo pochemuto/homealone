@@ -17,6 +17,7 @@ import javax.annotation.Nonnull;
 import com.google.common.base.Equivalence;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import io.micrometer.core.annotation.Timed;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -44,6 +45,7 @@ public class IkeaChecker {
     @Autowired
     private List<IkeaListener> listeners;
 
+    @Timed(value = "ikea.check")
     @Scheduled(fixedDelay = 30 * 60 * 1000)
     public void check() throws IOException {
         var known = itemRepository.findAll()
@@ -121,6 +123,7 @@ public class IkeaChecker {
     }
 
     @Cacheable
+    @Timed("ikea.actual")
     public List<Item> getActual() throws IOException {
         log.info("Checking {}", URL);
         Document page = Jsoup.connect(URL).get();

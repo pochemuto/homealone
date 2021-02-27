@@ -12,6 +12,7 @@ import com.google.common.collect.MapDifference.ValueDifference;
 import com.pochemuto.homealone.ikea.IkeaChecker;
 import com.pochemuto.homealone.ikea.IkeaListener;
 import com.pochemuto.homealone.ikea.Item;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,6 +38,9 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
     @Autowired
     private IkeaChecker ikeaChecker;
 
+    @Autowired
+    private MeterRegistry registry;
+
     @PostConstruct
     public void postConstruct() {
         log.info("Registering as bot {} with token {}",
@@ -59,13 +63,15 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            var text = update.getMessage().getText().toLowerCase().strip();
-            switch (text) {
-                case "/ikea", "/икея" -> ikea(update);
-                case "ping" -> ping(update);
+        registry.timer("bot.update").record(() -> {
+            if (update.hasMessage() && update.getMessage().hasText()) {
+                var text = update.getMessage().getText().toLowerCase().strip();
+                switch (text) {
+                    case "/ikea", "/икея" -> ikea(update);
+                    case "ping" -> ping(update);
+                }
             }
-        }
+        });
     }
 
     private void ping(Update update) {
