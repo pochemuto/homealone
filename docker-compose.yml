@@ -8,7 +8,7 @@ services:
     container_name: home
     networks:
       - spring-boot-admin
-      - nu
+      - homealone
 
   mongo:
     image: mongo:4.0-xenial
@@ -16,7 +16,7 @@ services:
     volumes:
       - mongo:/data/db
     networks:
-      - nu
+      - homealone
 
 volumes:
   mongo:
@@ -31,7 +31,8 @@ networks:
   spring-boot-admin:
     external: true
 
-  nu:
+  homealone:
+    name: homealone
     enable_ipv6: true
     driver: bridge
     driver_opts:
