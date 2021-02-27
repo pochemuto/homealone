@@ -28,14 +28,14 @@ public class MarafonLocalScraper {
         personalAccountPage.openPage("https://lk.lerchekmarafon.ru/");
         personalAccountPage.windowMaximize();
 
-        personalAccountPage.populateLoginNameField("******");
-        personalAccountPage.populateLoginPasswordField("*****");
+        personalAccountPage.populateLoginNameField("pochemuto@gmail.com");
+        personalAccountPage.populateLoginPasswordField("thebest1121");
         personalAccountPage.submitLoginForm();
         WaitUtils.waitABit(1000);
         personalAccountPage.openPage(personalAccountPage.generateFoodPageUrl(1, 2));
-        WaitUtils.waitABit(2000);
-        personalAccountPage.moveToElements();
-        ScreenShotUtil screenShotUtil = new ScreenShotUtil(driver);
-        screenShotUtil.captureScreenShot("dinner");
+        WaitUtils.waitABit(1000);
+        personalAccountPage.takeScreenShotsOfFood();
+        driver.quit();
+
     }
 }

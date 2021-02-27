@@ -1,11 +1,16 @@
 package com.pochemuto.homealone.marafon.page;
 
+import com.pochemuto.homealone.utils.ScreenShotUtil;
 import com.pochemuto.homealone.utils.WaitUtils;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+
+import java.io.IOException;
 
 public class PersonalAccountPage {
     //login page elements:
@@ -61,13 +66,39 @@ public class PersonalAccountPage {
         return  foodUrl = "https://lk.lerchekmarafon.ru/marafon/food?week=" + week + "&number=" + day;
     }
 
-    public PersonalAccountPage moveToElements(){
+    public PersonalAccountPage moveToElements(WebElement element){
         Actions actions = new Actions(driver);
-        actions.moveToElement(dinner);
-        actions.perform();
+        actions.sendKeys(Keys.END).build().perform();
+        WaitUtils.waitABit(500);
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+        js.executeScript("arguments[0].scrollIntoView();", element);
+
         return this;
     }
 
+    public PersonalAccountPage takeScreenShotsOfFood() throws IOException {
+        ScreenShotUtil screenShotUtil = new ScreenShotUtil(driver);
 
+        moveToElements(dinner);
+        WaitUtils.waitABit(500);
+        screenShotUtil.captureScreenShot(dinner.getText());
+        WaitUtils.waitABit(500);
+
+        moveToElements(lunch);
+        WaitUtils.waitABit(500);
+        screenShotUtil.captureScreenShot(lunch.getText());
+        WaitUtils.waitABit(500);
+
+        moveToElements(brunch);
+        WaitUtils.waitABit(500);
+        screenShotUtil.captureScreenShot(brunch.getText());
+        WaitUtils.waitABit(500);
+
+        moveToElements(breakfast);
+        WaitUtils.waitABit(500);
+        screenShotUtil.captureScreenShot(breakfast.getText());
+        WaitUtils.waitABit(500);
+        return this;
+    }
 
 }
