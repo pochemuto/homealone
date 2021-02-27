@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 public class MarafonLocalScraper {
-    private static final File IMG_FILE = Path.of("C:\\Users\\Кирилл\\Desktop\\" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".png").toFile();
+
     public static void main(String[] args) throws IOException {
         ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.setPageLoadStrategy(PageLoadStrategy.EAGER);
