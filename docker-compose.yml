@@ -14,9 +14,13 @@ services:
     image: mongo:4.0-xenial
     restart: always
     volumes:
-      - /etc/pochemuto/homealone/mongo:/data/db
+      - mongo:/data/db
     networks:
       - nu
+
+volumes:
+  mongo:
+    name: mongo-data
 
 secrets:
   secret-properties:
