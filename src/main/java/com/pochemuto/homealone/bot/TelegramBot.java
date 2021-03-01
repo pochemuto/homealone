@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
@@ -28,6 +31,8 @@ import static java.util.Comparator.comparing;
 @Slf4j
 @Component
 public class TelegramBot extends TelegramLongPollingBot implements IkeaListener {
+
+    private static final Pattern CYRILLIC = Pattern.compile("[а-яА-Я]");
 
     @Autowired
     private BotProperties properties;
@@ -92,6 +97,7 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
             sendApiMethod(EditMessageText.builder()
                     .messageId(requestingMessageId)
                     .chatId(String.valueOf(chatId))
+                    .disableWebPagePreview(true)
                     .text(formatItems(items))
                     .parseMode("markdown")
                     .build()
@@ -122,15 +128,22 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
         items.stream()
                 .sorted(itemsComparator())
                 .forEach(item -> {
-                    sb.append("• ");
+                    sb.append(item.isReduced() ? "⬇️" : "✅").append(" ");
                     formatItem(sb, item);
                     sb.append("\n");
                 });
+        sb.append("[Все посудомойки](https://www.ikea.com/ru/ru/cat/posudomoechnye-mashiny-20825/)");
         return sb.toString();
     }
 
     private static void formatItem(StringBuilder sb, Item item) {
-        sb.append(item.getName()).append(": `").append(item.getPrice()).append("`");
+        String cyrillicName = Stream.of(item.getName().split("\\s"))
+                .filter(CYRILLIC.asPredicate())
+                .collect(Collectors.joining(" "));
+
+        sb.append("[").append(cyrillicName)
+                .append("](https://www.ikea.com/ru/ru/p/link-").append(item.getId()).append(")")
+                .append(": `").append(item.getPrice()).append("`");
     }
 
     private String formatChanged(List<ValueDifference<Item>> changed) {
@@ -188,6 +201,7 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
                 sendApiMethod(SendMessage.builder()
                         .chatId(String.valueOf(user.getId().getChatId()))
                         .parseMode("markdown")
+                        .disableWebPagePreview(true)
                         .text(text)
                         .build()
                 );
