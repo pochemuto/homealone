@@ -59,7 +59,7 @@ public class IkeaChecker {
         var actual = items.stream()
                 .collect(toMap(Item::getId, identity()));
 
-        var difference = Maps.difference(actual, known, new Equivalence<>() {
+        var difference = Maps.difference(known, actual, new Equivalence<>() {
             @Override
             protected boolean doEquivalent(@Nonnull Item a, @Nonnull Item b) {
                 return Objects.equals(a.getId(), b.getId())
@@ -76,11 +76,11 @@ public class IkeaChecker {
 
         if (!difference.areEqual()) {
             log.info("Found difference, new names: {}, removed: {}, changed: {}",
-                    difference.entriesOnlyOnLeft(), difference.entriesOnlyOnRight(), difference.entriesDiffering());
+                    difference.entriesOnlyOnRight(), difference.entriesOnlyOnLeft(), difference.entriesDiffering());
 
             for (IkeaListener listener : listeners) {
-                var added = List.copyOf(difference.entriesOnlyOnLeft().values());
-                var removed = List.copyOf(difference.entriesOnlyOnRight().values());
+                var added = List.copyOf(difference.entriesOnlyOnRight().values());
+                var removed = List.copyOf(difference.entriesOnlyOnLeft().values());
                 var changed = List.copyOf(difference.entriesDiffering().values());
                 listener.onItemsChanged(added, removed, changed);
             }
