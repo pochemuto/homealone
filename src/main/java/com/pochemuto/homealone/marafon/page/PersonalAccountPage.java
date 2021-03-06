@@ -69,8 +69,8 @@ public class PersonalAccountPage {
     public PersonalAccountPage moveToElements(WebElement element)  {
         Actions actions = new Actions(driver);
         actions.sendKeys(Keys.END).build().perform();
-        actions.moveToElement(dinner);
-        actions.perform();
+//        actions.moveToElement(dinner);
+//        actions.perform();
         WaitUtils.waitABit(500);
         JavascriptExecutor js = (JavascriptExecutor)driver;
         js.executeScript("arguments[0].scrollIntoView();", element);
