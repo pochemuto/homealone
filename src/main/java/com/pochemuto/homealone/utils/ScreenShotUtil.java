@@ -20,5 +20,6 @@ public class ScreenShotUtil {
 
         File targetFile = new File("./Screenshots/" + fileName + ".png");
         FileUtils.copyFile(scrFile, targetFile);
+
     }
 }
