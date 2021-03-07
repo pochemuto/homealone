@@ -44,6 +44,9 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
     @Autowired
     private IkeaChecker ikeaChecker;
 
+    @Autowired
+    private MarafonLocalScraper marafonLocalScraper;
+
 
 
     @PostConstruct
@@ -86,8 +89,8 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
             return;
         }
         meetUser(update);
-        MarafonLocalScraper getFood = new MarafonLocalScraper();
-        getFood.getData();
+
+        marafonLocalScraper.getData();
         File breakfast = new File("./Screenshots/Завтрак.png");
         File brunch = new File("./Screenshots/Перекус 1.png");
         File lunch = new File("./Screenshots/Обед.png");

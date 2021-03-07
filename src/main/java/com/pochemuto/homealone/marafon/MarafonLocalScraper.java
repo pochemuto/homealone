@@ -1,6 +1,7 @@
 package com.pochemuto.homealone.marafon;
 
 import com.google.common.base.Preconditions;
+import com.pochemuto.homealone.ikea.IkeaChecker;
 import com.pochemuto.homealone.marafon.page.PersonalAccountPage;
 import com.pochemuto.homealone.utils.ScreenShotUtil;
 import com.pochemuto.homealone.utils.WaitUtils;
@@ -9,6 +10,8 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,9 +21,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
-
+@Component
 public class MarafonLocalScraper {
     final LocalDate startDate = LocalDate.of(2021, 2, 15);
+    @Autowired
+    private MarafonProperties marafonProperties;
 
     public  void getData() throws IOException {
         ChromeOptions chromeOptions = new ChromeOptions();
@@ -31,8 +36,9 @@ public class MarafonLocalScraper {
         personalAccountPage.openPage("https://lk.lerchekmarafon.ru/");
         personalAccountPage.windowMaximize();
 
-        personalAccountPage.populateLoginNameField("*******");
-        personalAccountPage.populateLoginPasswordField("********");
+
+        personalAccountPage.populateLoginNameField(marafonProperties.getLogin());
+        personalAccountPage.populateLoginPasswordField(marafonProperties.getPassword());
         personalAccountPage.submitLoginForm();
         WaitUtils.waitABit(1000);
         personalAccountPage.openPage(personalAccountPage.generateFoodPageUrl(getCurrentWeek(startDate),getCurrentDay()));
