@@ -20,6 +20,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 public class MarafonLocalScraper {
+    final LocalDate startDate = LocalDate.of(2021, 2, 15);
 
     public  void getData() throws IOException {
         ChromeOptions chromeOptions = new ChromeOptions();
@@ -30,45 +31,33 @@ public class MarafonLocalScraper {
         personalAccountPage.openPage("https://lk.lerchekmarafon.ru/");
         personalAccountPage.windowMaximize();
 
-        personalAccountPage.populateLoginNameField("******");
-        personalAccountPage.populateLoginPasswordField("****");
+        personalAccountPage.populateLoginNameField("*******");
+        personalAccountPage.populateLoginPasswordField("********");
         personalAccountPage.submitLoginForm();
         WaitUtils.waitABit(1000);
-        personalAccountPage.openPage(personalAccountPage.generateFoodPageUrl(countWeeks(),countDays()));
+        personalAccountPage.openPage(personalAccountPage.generateFoodPageUrl(getCurrentWeek(startDate),getCurrentDay()));
         WaitUtils.waitABit(1000);
         personalAccountPage.takeScreenShotsOfFood();
         driver.quit();
     }
 
-    public int countWeeks(){
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        final String firstInput = "2021-02-15";
-        LocalDate now = LocalDate.now();
-        formatter.format(now);
-        String currentData = now.toString();
-        final String secondInput = currentData;
-        final LocalDate firstDate = LocalDate.parse(firstInput, formatter);
-        final LocalDate secondDate = LocalDate.parse(secondInput, formatter);
-        final int days = (int) ChronoUnit.DAYS.between(firstDate, secondDate);
-        int weeks = days/7;
-        return weeks;
+    public long getCurrentWeek(LocalDate startDate){
+        LocalDate currentDate = LocalDate.now();
+        return ChronoUnit.WEEKS.between(startDate, currentDate);
     }
 
-    public int countDays(){
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        final String firstInput = "2021-02-15";
-        LocalDate now = LocalDate.now();
-        formatter.format(now);
-        String currentData = now.toString();
-
-        final String secondInput = currentData;
-        final LocalDate firstDate = LocalDate.parse(firstInput, formatter);
-        final LocalDate secondDate = LocalDate.parse(secondInput, formatter);
-        final int days = (int) ChronoUnit.DAYS.between(firstDate, secondDate)-countWeeks()*7;
-        return days;
+    public int getCurrentDay(){
+        return LocalDate.now().getDayOfWeek().getValue();
     }
+
+//    public static void main(String[] args) {
+//        MarafonLocalScraper week = new MarafonLocalScraper();
+//       long w = week.getCurrentWeek(LocalDate.of(2021, 02, 15));
+//       int d = week.getCurrentDay();
+//
+//        System.out.println(w);
+//        System.out.println(d);
+//    }
 
 
 }

@@ -61,16 +61,15 @@ public class PersonalAccountPage {
     }
 
 
-    public String generateFoodPageUrl(int week, int day) {
-        String foodUrl;
-        return  foodUrl = "https://lk.lerchekmarafon.ru/marafon/food?week=" + week + "&number=" + day;
+    public String generateFoodPageUrl(long week, int day) {
+
+        return "https://lk.lerchekmarafon.ru/marafon/food?week=" + week + "&number=" + day;
     }
 
     public PersonalAccountPage moveToElements(WebElement element)  {
         Actions actions = new Actions(driver);
         actions.sendKeys(Keys.END).build().perform();
-//        actions.moveToElement(dinner);
-//        actions.perform();
+
         WaitUtils.waitABit(500);
         JavascriptExecutor js = (JavascriptExecutor)driver;
         js.executeScript("arguments[0].scrollIntoView();", element);
