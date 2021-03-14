@@ -6,8 +6,11 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
+import java.time.Duration;
 
 public class PersonalAccountPage {
 
@@ -20,6 +23,8 @@ public class PersonalAccountPage {
     private WebElement submitButton;
 
     //food page elements:
+    @FindBy(xpath = "//header")
+    private WebElement header;
     @FindBy(xpath = "//*[text()='Завтрак']")
     private WebElement breakfast;
     @FindBy(xpath = "//*[text()='Перекус 1']")
@@ -89,29 +94,28 @@ public class PersonalAccountPage {
     public PersonalAccountPage takeScreenShotsOfFood() throws IOException {
         ScreenShotUtil screenShotUtil = new ScreenShotUtil(driver);
 
+        WaitUtils.waitToBeVisible(driver, header);
+
         driver.manage().window().setSize(getDimensionOfWindow(dinnerComponents));
         moveToElements(dinner);
-        WaitUtils.waitABit(500);
+        WaitUtils.waitToBeVisible(driver, dinner);
         screenShotUtil.captureScreenShot(dinner.getText());
-        WaitUtils.waitABit(500);
 
         driver.manage().window().setSize(getDimensionOfWindow(lunchComponents));
         moveToElements(lunch);
-        WaitUtils.waitABit(500);
+        WaitUtils.waitToBeVisible(driver, lunch);
         screenShotUtil.captureScreenShot(lunch.getText());
-        WaitUtils.waitABit(500);
 
         driver.manage().window().setSize(getDimensionOfWindow(brunchComponents));
         moveToElements(brunch);
-        WaitUtils.waitABit(500);
+        WaitUtils.waitToBeVisible(driver, brunch);
         screenShotUtil.captureScreenShot(brunch.getText());
-        WaitUtils.waitABit(500);
 
-        driver.manage().window().setSize(getDimensionOfWindow(brunchComponents));
+        driver.manage().window().setSize(getDimensionOfWindow(breakfastComponents));
         moveToElements(breakfast);
-        WaitUtils.waitABit(500);
+        WaitUtils.waitToBeVisible(driver, breakfast);
         screenShotUtil.captureScreenShot(breakfast.getText());
-        WaitUtils.waitABit(500);
+
         return this;
     }
 

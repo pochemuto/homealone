@@ -36,19 +36,15 @@ public class MarafonLocalScraper {
     public  void getData() throws IOException {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--force-device-scale-factor=1.0");
-
+        options.setPageLoadStrategy(PageLoadStrategy.EAGER);
         WebDriver driver = new RemoteWebDriver(new URL(SELENIUM_URL), options);
-
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
         log.info("open browser");
         PersonalAccountPage personalAccountPage = new PersonalAccountPage(driver);
         personalAccountPage.openPage("https://lk.lerchekmarafon.ru/");
-
         Dimension dimension = new Dimension(831, 1800);
         driver.manage().window().setSize(dimension);
-
-
 
         personalAccountPage.populateLoginNameField(marafonProperties.getLogin());
         personalAccountPage.populateLoginPasswordField(marafonProperties.getPassword());
@@ -57,15 +53,12 @@ public class MarafonLocalScraper {
         WaitUtils.waitABit(1000);
         personalAccountPage.openPage(personalAccountPage.generateFoodPageUrl(getCurrentWeek(startDate),getCurrentDay()));
         WaitUtils.waitABit(1000);
-
         log.info("go to food page");
-        log.info("breakfast size is {}", personalAccountPage.getHeightOfElement(driver.findElement(By.xpath("//*[text()='Завтрак']/following::div[2]"))));
-        log.info("brunch size is {}", personalAccountPage.getHeightOfElement(driver.findElement(By.xpath("//*[text()='Перекус 1']/following::div[2]"))));
-        log.info("lunch size is {}", personalAccountPage.getHeightOfElement(driver.findElement(By.xpath("//*[text()='Обед']/following::div[2]"))));
-        log.info("dinner size is {}", personalAccountPage.getHeightOfElement(driver.findElement(By.xpath("//*[text()='Ужин']/following::div[2]"))));
+
         personalAccountPage.takeScreenShotsOfFood();
         log.info("take screenshots");
         driver.quit();
+        log.info("browser is closed");
     }
 
     public long getCurrentWeek(LocalDate startDate){
@@ -77,14 +70,7 @@ public class MarafonLocalScraper {
         return LocalDate.now().getDayOfWeek().getValue();
     }
 
- //   public static void main(String[] args) {
-//        MarafonLocalScraper week = new MarafonLocalScraper();
-//       long w = week.getCurrentWeek(LocalDate.of(2021, 02, 15));
-//       int d = week.getCurrentDay();
-//
-//        System.out.println(w);
-//        System.out.println(d);
-//    }
+
 
 
 }
