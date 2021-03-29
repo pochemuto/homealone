@@ -48,7 +48,7 @@ public class IkeaChecker {
     @Timed(value = "ikea.check")
     @Scheduled(fixedDelay = 30 * 60 * 1000)
     public void check() throws IOException {
-        var known = itemRepository.findAll()
+        var known = itemRepository.findByRemovedFalse()
                 .stream()
                 .collect(toMap(Item::getId, identity()));
 
@@ -78,12 +78,20 @@ public class IkeaChecker {
             log.info("Found difference, new names: {}, removed: {}, changed: {}",
                     difference.entriesOnlyOnRight(), difference.entriesOnlyOnLeft(), difference.entriesDiffering());
 
+            var added = List.copyOf(difference.entriesOnlyOnRight().values());
+            var removed = List.copyOf(difference.entriesOnlyOnLeft().values());
+            var changed = List.copyOf(difference.entriesDiffering().values());
+
             for (IkeaListener listener : listeners) {
-                var added = List.copyOf(difference.entriesOnlyOnRight().values());
-                var removed = List.copyOf(difference.entriesOnlyOnLeft().values());
-                var changed = List.copyOf(difference.entriesDiffering().values());
                 listener.onItemsChanged(added, removed, changed);
             }
+
+            itemRepository.saveAll(
+                    removed.stream()
+                    .peek(r -> r.setRemoved(true))
+                    .collect(Collectors.toList())
+            );
+
         } else {
             log.info("No difference found");
         }

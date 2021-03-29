@@ -19,5 +19,7 @@ public class Item {
 
     boolean reduced;
 
+    boolean removed;
+
     Instant lastSeen;
 }
