@@ -7,7 +7,7 @@ plugins {
 
 group = 'com.pochemuto'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '15'
+sourceCompatibility = '16'
 
 repositories {
     mavenCentral()
@@ -82,12 +82,15 @@ dependencies {
     implementation 'io.micrometer:micrometer-registry-prometheus'
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
-    compileOnly 'org.projectlombok:lombok:1.18.16'
-    annotationProcessor 'org.projectlombok:lombok:1.18.16'
+
+    // lombok
+    def lombokVersion = '1.18.20'
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testCompileOnly 'org.projectlombok:lombok:1.18.16'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.16'
 
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'com.google.guava:guava:30.1-jre'
