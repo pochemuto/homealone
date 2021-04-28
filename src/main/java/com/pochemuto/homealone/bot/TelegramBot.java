@@ -1,5 +1,6 @@
 package com.pochemuto.homealone.bot;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
@@ -15,13 +16,17 @@ import com.google.common.collect.MapDifference.ValueDifference;
 import com.pochemuto.homealone.ikea.IkeaChecker;
 import com.pochemuto.homealone.ikea.IkeaListener;
 import com.pochemuto.homealone.ikea.Item;
+import com.pochemuto.homealone.marafon.MarafonLocalScraper;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.interfaces.BotApiObject;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -42,6 +47,9 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
 
     @Autowired
     private IkeaChecker ikeaChecker;
+
+    @Autowired
+    private MarafonLocalScraper marafonLocalScraper;
 
     @Autowired
     private MeterRegistry registry;
@@ -73,13 +81,39 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
                 var text = update.getMessage().getText().toLowerCase().strip();
                 switch (text) {
                     case "/ikea", "/икея" -> ikea(update);
-                    case "ping" -> ping(update);
+                    case "ping" -> pong(update);
+                    case "/marafon" -> marafon(update);
                 }
             }
         });
     }
 
-    private void ping(Update update) {
+    private void marafon(Update update) {
+        long chatId = update.getMessage().getChatId();
+        Integer requestingMessageId = sendMessage(chatId, "Смотрим...");
+        if (requestingMessageId == null) {
+            return;
+        }
+        meetUser(update);
+
+        try {
+            marafonLocalScraper.getData();
+        } catch (IOException e) {
+            throw new RuntimeException("cannot write screenshots", e);
+        }
+
+        File breakfast = new File("./Screenshots/Завтрак.png");
+        File brunch = new File("./Screenshots/Перекус 1.png");
+        File lunch = new File("./Screenshots/Обед.png");
+        File dinner = new File("./Screenshots/Ужин.png");
+
+        sendPhoto(chatId, breakfast);
+        sendPhoto(chatId, brunch);
+        sendPhoto(chatId, lunch);
+        sendPhoto(chatId, dinner);
+    }
+
+    private void pong(Update update) {
         log.info("Sending pong");
         sendMessage(update.getMessage().getChatId(), "pong");
         log.info("Pong!");
@@ -177,6 +211,19 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
             return response.getMessageId();
         } catch (TelegramApiException telegramApiException) {
             log.error("Cannot send reply", telegramApiException);
+        }
+        return null;
+    }
+
+    private BotApiObject sendPhoto(long chatID, File photo) {
+        try {
+            InputFile targetPhoto = new InputFile(photo);
+            SendPhoto sendPhoto = new SendPhoto();
+            sendPhoto.setChatId(String.valueOf(chatID));
+            sendPhoto.setPhoto(targetPhoto);
+            return execute(sendPhoto);
+        } catch (TelegramApiException telegramApiException) {
+            log.error("Cannot send photo", telegramApiException);
         }
         return null;
     }
