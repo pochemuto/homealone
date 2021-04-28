@@ -18,7 +18,6 @@ import com.pochemuto.homealone.ikea.IkeaListener;
 import com.pochemuto.homealone.ikea.Item;
 import com.pochemuto.homealone.marafon.MarafonLocalScraper;
 import io.micrometer.core.instrument.MeterRegistry;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -75,7 +74,6 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
     }
     //endregion
 
-    @SneakyThrows
     @Override
     public void onUpdateReceived(Update update) {
         registry.timer("bot.update").record(() -> {
@@ -84,13 +82,13 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
                 switch (text) {
                     case "/ikea", "/икея" -> ikea(update);
                     case "ping" -> pong(update);
-                case "/marafon" -> marafon(update);
+                    case "/marafon" -> marafon(update);
                 }
             }
         });
     }
 
-    private void marafon(Update update) throws IOException {
+    private void marafon(Update update) {
         long chatId = update.getMessage().getChatId();
         Integer requestingMessageId = sendMessage(chatId, "Смотрим...");
         if (requestingMessageId == null) {
@@ -98,7 +96,12 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
         }
         meetUser(update);
 
-        marafonLocalScraper.getData();
+        try {
+            marafonLocalScraper.getData();
+        } catch (IOException e) {
+            throw new RuntimeException("cannot write screenshots", e);
+        }
+
         File breakfast = new File("./Screenshots/Завтрак.png");
         File brunch = new File("./Screenshots/Перекус 1.png");
         File lunch = new File("./Screenshots/Обед.png");
@@ -108,9 +111,7 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
         sendPhoto(chatId, brunch);
         sendPhoto(chatId, lunch);
         sendPhoto(chatId, dinner);
-
     }
-
 
     private void pong(Update update) {
         log.info("Sending pong");
@@ -121,8 +122,6 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
     private void ikea(Update update) {
         long chatId = update.getMessage().getChatId();
         try {
-
-
             Integer requestingMessageId = sendMessage(chatId, "Смотрим...");
             if (requestingMessageId == null) {
                 return;
@@ -217,16 +216,16 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
     }
 
     private BotApiObject sendPhoto(long chatID, File photo) {
-        try{
+        try {
             InputFile targetPhoto = new InputFile(photo);
             SendPhoto sendPhoto = new SendPhoto();
             sendPhoto.setChatId(String.valueOf(chatID));
             sendPhoto.setPhoto(targetPhoto);
             return execute(sendPhoto);
         } catch (TelegramApiException telegramApiException) {
-        log.error("Cannot send photo", telegramApiException);
-    }
-            return null;
+            log.error("Cannot send photo", telegramApiException);
+        }
+        return null;
     }
 
     @Override
