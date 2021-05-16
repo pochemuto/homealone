@@ -6,13 +6,14 @@ import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.bots.AbsSender;
 
 @Slf4j
 @Component
 public class TelegramHealthIndicator extends AbstractHealthIndicator {
 
     @Autowired
-    private TelegramBot bot;
+    private AbsSender bot;
 
     @Override
     protected void doHealthCheck(Health.Builder builder) throws Exception {

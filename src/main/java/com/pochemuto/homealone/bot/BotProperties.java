@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("bot")
 @Component
 public class BotProperties {
+    public static final String EMPTY_WEBHOOK = "http://localhost";
     private String token;
     private String username;
+    private String webhookPath = EMPTY_WEBHOOK;
+    private String webhookUrl;
 }
