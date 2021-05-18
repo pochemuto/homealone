@@ -8,30 +8,30 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 80
+      targetPort: 8081
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: simple-app
+  name: homealone
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: simple-app
+      name: homealone
   template:
     metadata:
       labels:
-        name: simple-app
-        app: simple
+        name: homealone
+        app: homealone
     spec:
       containers:
-        - name: simple-app
-          image: cr.yandex/crp4g65pbp8qf4mtcos7/simple
+        - name: homealone
+          image: cr.yandex/crp4g65pbp8qf4mtcos7/homealone
           env:
             - name: SPRING_PROFILES_ACTIVE
-              value: stable
+              value: testing
             - name: SPRING_DATA_MONGODB_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -43,11 +43,10 @@ spec:
                   name: mongo
                   key: password
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
           readinessProbe:
-            httpGet:
-              path: /ping
-              port: 8080
+            tcpSocket:
+              port: 8081
           volumeMounts:
             - name: config
               mountPath: /config
@@ -55,10 +54,10 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: simple-app
+            name: homealone
             items:
-              - key: properties
-                path: application-stable.yaml
+              - key: testing
+                path: application-testing.yaml
         - name: mongo
           secret:
             secretName: mongo
@@ -67,9 +66,9 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: simple-app
+  name: homealone
 data:
-  properties: |
+  testing: |
     spring:
       data:
         mongodb:
@@ -97,5 +96,5 @@ spec:
           - path: "/"
             pathType: Prefix
             backend:
-              serviceName: simple-app
+              serviceName: homealone
               servicePort: 80
