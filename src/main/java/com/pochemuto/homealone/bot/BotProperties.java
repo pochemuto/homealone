@@ -13,4 +13,5 @@ public class BotProperties {
     private String username;
     private String webhookPath = EMPTY_WEBHOOK;
     private String webhookUrl;
+    private int localPort = 8081;
 }

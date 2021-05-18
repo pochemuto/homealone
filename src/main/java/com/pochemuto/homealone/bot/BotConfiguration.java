@@ -1,5 +1,6 @@
 package com.pochemuto.homealone.bot;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +11,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import org.telegram.telegrambots.updatesreceivers.DefaultWebhook;
 
+@Slf4j
 @Configuration
 public class BotConfiguration {
     @Autowired
@@ -33,7 +35,12 @@ public class BotConfiguration {
     @ConditionalOnProperty(prefix = "bot", name = "webhook-path")
     public TelegramBotsApi telegramBotsApi() throws TelegramApiException {
         var webhook = new DefaultWebhook();
-        webhook.setInternalUrl("http://localhost:8081");
+        webhook.setInternalUrl("https://localhost:" + botProperties.getLocalPort());
+        log.info("Created webhook at port {} for url {}", botProperties.getLocalPort(),
+                botProperties.getWebhookUrl()
+                        .replace(botProperties.getToken(), "<token>")
+                        .replace(botProperties.getUsername(), "<username>")
+        );
         return new TelegramBotsApi(DefaultBotSession.class, webhook);
     }
 
