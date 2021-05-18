@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: homealone
+spec:
+  selector:
+    name: homealone
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: simple-app
+  template:
+    metadata:
+      labels:
+        name: simple-app
+        app: simple
+    spec:
+      containers:
+        - name: simple-app
+          image: cr.yandex/crp4g65pbp8qf4mtcos7/simple
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: stable
+            - name: SPRING_DATA_MONGODB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo
+                  key: username
+            - name: SPRING_DATA_MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo
+                  key: password
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 8080
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: simple-app
+            items:
+              - key: properties
+                path: application-stable.yaml
+        - name: mongo
+          secret:
+            secretName: mongo
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: simple-app
+data:
+  properties: |
+    spring:
+      data:
+        mongodb:
+          database: main
+          host: mongo
+          port: 27018
+          replica-set-name: rs01
+
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: homealone
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+    - hosts:
+        - homealone.pochemuto.com
+      secretName: homealone-letsencrypt-prod
+  rules:
+    - host: homealone.pochemuto.com
+      http:
+        paths:
+          - path: "/"
+            pathType: Prefix
+            backend:
+              serviceName: simple-app
+              servicePort: 80
