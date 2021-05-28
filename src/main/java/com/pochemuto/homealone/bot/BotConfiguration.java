@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Primary;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
-import org.telegram.telegrambots.updatesreceivers.DefaultWebhook;
 
 @Slf4j
 @Configuration
@@ -25,24 +24,33 @@ public class BotConfiguration {
         return new LongPollingBotImpl();
     }
 
-    @Bean
+    @Configuration
     @ConditionalOnProperty(prefix = "bot", name = "webhook-path")
-    public WebHookBot webHookBot() {
-        return new WebHookBot(botProperties.getWebhookUrl());
+    public static class WebHookConfig {
+        @Autowired
+        private BotProperties botProperties;
+
+        @Autowired
+        private BotController botController;
+
+        @Bean
+        public WebHookBot webHookBot() {
+            return new WebHookBot(botProperties.getWebhookUrl());
+        }
+
+        @Bean
+        public TelegramBotsApi telegramBotsApi() throws TelegramApiException {
+            var api = new TelegramBotsApi(DefaultBotSession.class, botController);
+            log.info("Created webhook at port {} for url {}", botProperties.getLocalPort(),
+                    botProperties.getWebhookUrl()
+                            .replace(botProperties.getToken(), "<token>")
+                            .replace(botProperties.getUsername(), "<username>")
+            );
+            return api;
+        }
+
     }
 
-    @Bean
-    @ConditionalOnProperty(prefix = "bot", name = "webhook-path")
-    public TelegramBotsApi telegramBotsApi() throws TelegramApiException {
-        var webhook = new DefaultWebhook();
-        webhook.setInternalUrl("https://localhost:" + botProperties.getLocalPort());
-        log.info("Created webhook at port {} for url {}", botProperties.getLocalPort(),
-                botProperties.getWebhookUrl()
-                        .replace(botProperties.getToken(), "<token>")
-                        .replace(botProperties.getUsername(), "<username>")
-        );
-        return new TelegramBotsApi(DefaultBotSession.class, webhook);
-    }
 
 }
 
