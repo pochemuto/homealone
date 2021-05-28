@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: homealone
-          image: cr.yandex/crp4g65pbp8qf4mtcos7/homealone:v1
+          image: pochemuto/homealone:v3
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: testing
@@ -86,7 +86,7 @@ spec:
             name: homealone-config
             items:
               - key: testing
-                path: application-testing.yaml
+                path: application-testing.yml
         - name: homealone-secrets
           secret:
             secretName: homealone-secrets
