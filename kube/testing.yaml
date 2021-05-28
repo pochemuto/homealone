@@ -28,55 +28,71 @@ spec:
     spec:
       containers:
         - name: homealone
-          image: cr.yandex/crp4g65pbp8qf4mtcos7/homealone
+          image: cr.yandex/crp4g65pbp8qf4mtcos7/homealone:v1
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: testing
-            - name: SPRING_DATA_MONGODB_USERNAME
+            - name: MAIL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: homealone-secrets
+                  key: mail_username
+            - name: MAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: homealone-secrets
+                  key: mail_password
+            - name: MONGO_USERNAME
               valueFrom:
                 secretKeyRef:
                   name: mongo
                   key: username
-            - name: SPRING_DATA_MONGODB_PASSWORD
+            - name: MONGO_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: mongo
                   key: password
+            - name: BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: homealone-secrets
+                  key: bot_token
+            - name: BOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: homealone-secrets
+                  key: bot_username
+            - name: MARAFON_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: homealone-secrets
+                  key: marafon_password
+
           ports:
             - containerPort: 8081
+
           readinessProbe:
             tcpSocket:
               port: 8081
+
           volumeMounts:
             - name: config
               mountPath: /config
               readOnly: true
+
       volumes:
         - name: config
           configMap:
-            name: homealone
+            name: homealone-config
             items:
               - key: testing
                 path: application-testing.yaml
+        - name: homealone-secrets
+          secret:
+            secretName: homealone-secrets
         - name: mongo
           secret:
             secretName: mongo
-
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: homealone
-data:
-  testing: |
-    spring:
-      data:
-        mongodb:
-          database: main
-          host: mongo
-          port: 27018
-          replica-set-name: rs01
-
 ---
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress

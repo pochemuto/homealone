@@ -1,0 +1,37 @@
+cache:
+  ikea:
+    expire: 2m
+
+
+spring:
+  application:
+    name: Homealone
+
+  boot:
+    admin:
+      client:
+        url: http://spring-boot-admin:8283
+
+  data:
+    mongodb:
+      host: mongo
+
+  mail:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          connectiontimeout: 5000
+          starttls:
+            enable: true
+          timeout: 5000
+          writetimeout: 5000
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: '*'

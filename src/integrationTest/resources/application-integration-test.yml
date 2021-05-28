@@ -1,0 +1,13 @@
+application:
+    scheduling:
+        enabled: false
+
+spring:
+    boot:
+        admin:
+            client:
+                enabled: false
+
+    data:
+        mongodb:
+            host: ''
