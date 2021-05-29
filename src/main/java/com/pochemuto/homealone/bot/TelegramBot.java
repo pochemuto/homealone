@@ -4,13 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
 
 import com.google.common.collect.MapDifference.ValueDifference;
 import com.pochemuto.homealone.ikea.IkeaChecker;
@@ -21,7 +19,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.interfaces.BotApiObject;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -29,18 +26,19 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import static java.util.Comparator.comparing;
 
 @Slf4j
 @Component
-public class TelegramBot extends TelegramLongPollingBot implements IkeaListener {
+public class TelegramBot implements Receiver, IkeaListener {
 
     private static final Pattern CYRILLIC = Pattern.compile("[а-яА-Я]");
 
     @Autowired
-    private BotProperties properties;
+    private AbsSender messageSender;
 
     @Autowired
     private UserRepository userRepository;
@@ -53,26 +51,6 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
 
     @Autowired
     private MeterRegistry registry;
-
-    @PostConstruct
-    public void postConstruct() {
-        log.info("Registering as bot {} with token {}",
-                getBotUsername(),
-                Objects.requireNonNullElse(getBotToken(), "null").substring(0, 4)
-        );
-    }
-
-    //region Settings
-    @Override
-    public String getBotUsername() {
-        return properties.getUsername();
-    }
-
-    @Override
-    public String getBotToken() {
-        return properties.getToken();
-    }
-    //endregion
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -128,7 +106,7 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
             }
             meetUser(update);
             var items = ikeaChecker.getActual();
-            sendApiMethod(EditMessageText.builder()
+            messageSender.execute(EditMessageText.builder()
                     .messageId(requestingMessageId)
                     .chatId(String.valueOf(chatId))
                     .disableWebPagePreview(true)
@@ -202,7 +180,7 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
     @Nullable
     private Integer sendMessage(long chatId, String text) {
         try {
-            Message response = sendApiMethod(SendMessage.builder()
+            Message response = messageSender.execute(SendMessage.builder()
                     .chatId(String.valueOf(chatId))
                     .text(text)
                     .parseMode("markdown")
@@ -221,7 +199,7 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
             SendPhoto sendPhoto = new SendPhoto();
             sendPhoto.setChatId(String.valueOf(chatID));
             sendPhoto.setPhoto(targetPhoto);
-            return execute(sendPhoto);
+            return messageSender.execute(sendPhoto);
         } catch (TelegramApiException telegramApiException) {
             log.error("Cannot send photo", telegramApiException);
         }
@@ -245,7 +223,7 @@ public class TelegramBot extends TelegramLongPollingBot implements IkeaListener 
         log.info("Sending message to {} users: {}", users.size(), users);
         for (User user : users) {
             try {
-                sendApiMethod(SendMessage.builder()
+                messageSender.execute(SendMessage.builder()
                         .chatId(String.valueOf(user.getId().getChatId()))
                         .parseMode("markdown")
                         .disableWebPagePreview(true)

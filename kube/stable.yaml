@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: homealone
+spec:
+  selector:
+    name: homealone
+    env: stable
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homealone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: homealone
+      env: stable
+  template:
+    metadata:
+      labels:
+        name: homealone
+        app: homealone
+        env: stable
+    spec:
+      containers:
+        - name: homealone
+          image: pochemuto/homealone:v8
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: stable
+            - name: MAIL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: homealone-secrets
+                  key: mail_username
+            - name: MAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: homealone-secrets
+                  key: mail_password
+            - name: MONGO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo
+                  key: username
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo
+                  key: password
+            - name: BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: homealone-secrets
+                  key: bot_token
+            - name: BOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: homealone-secrets
+                  key: bot_username
+            - name: MARAFON_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: homealone-secrets
+                  key: marafon_password
+
+          ports:
+            - containerPort: 8080
+
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /bot/ping
+
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+
+      volumes:
+        - name: config
+          configMap:
+            name: homealone-config
+            items:
+              - key: stable
+                path: application-stable.yml
+        - name: homealone-secrets
+          secret:
+            secretName: homealone-secrets
+        - name: mongo
+          secret:
+            secretName: mongo

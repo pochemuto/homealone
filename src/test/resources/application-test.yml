@@ -1,0 +1,13 @@
+spring:
+    boot:
+        admin:
+            client:
+                enabled: false
+    data:
+        mongodb:
+            host: ''
+    mail:
+        host: ''
+
+telegrambots:
+    enabled: false

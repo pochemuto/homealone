@@ -48,24 +48,16 @@ class IkeaCheckerIntegrationTest {
         assertThat(itemRepository.count()).isZero();
 
         ikeaChecker.check();
-
+        int total = ikeaChecker.getTotal();
         var items = itemRepository.findAll();
-        assertThat(items)
-                .extracting(Item::getName)
-                .containsExactlyInAnyOrder(
-                        "HJÄLPSAM ЭЛЬПСАМ",
-                        "LAGAN ЛАГАН",
-                        "LAGAN ЛАГАН",
-                        "SKINANDE СКИНАНДЕ",
-                        "HYGIENISK ХИГИЕНИСК",
-                        "PROFFSIG ПРОФФСИГ",
-                        "DISKAD ДИСКАД"
-                );
+
+        assertThat(total).isGreaterThan(0);
+        assertThat(items).hasSize(total);
 
         assertThat(items)
                 .extracting(Item::getPrice)
                 .doesNotContainNull()
-                .allMatch(price -> price.intValue() > 15_000 && price.intValue() < 60_000);
+                .allMatch(price -> price.intValue() >= 2_900 && price.intValue() < 80_000);
 
         assertThat(items)
                 .extracting(Item::isReduced)

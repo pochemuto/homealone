@@ -9,12 +9,14 @@ group = 'com.pochemuto'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '16'
 
+
 repositories {
     mavenCentral()
 }
 
 ext {
-    set('springBootAdminVersion', "2.3.1")
+    set('springBootAdminVersion', '2.3.1')
+    set('mongodb.version', '3.12.8')
 }
 
 application {

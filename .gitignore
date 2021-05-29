@@ -1,4 +1,5 @@
 secret.properties
+kube/secrets.yaml
 data/
 
 HELP.md

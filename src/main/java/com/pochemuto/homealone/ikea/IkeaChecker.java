@@ -138,7 +138,7 @@ public class IkeaChecker {
 
         Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-        List<Item> items = page.select(".range-revamp-product-compact__bottom-wrapper")
+        List<Item> items = page.select("noscript .plp-product-list .range-revamp-product-compact__bottom-wrapper")
                 .stream()
                 .map(this::parse)
                 .peek(item -> item.setLastSeen(now))
@@ -148,5 +148,12 @@ public class IkeaChecker {
         return items;
     }
 
+    public int getTotal() throws IOException {
+        log.info("Getting total in {}", URL);
+        Document page = Jsoup.connect(URL).get();
+
+        String filterText = page.selectFirst(".catalog-product-list__total-count").text();
+        return Integer.parseInt(filterText.split("\s")[1]);
+    }
 }
 
