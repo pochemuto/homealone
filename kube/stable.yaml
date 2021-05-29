@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: homealone-testing
+  name: homealone
 spec:
   selector:
     name: homealone
-    env: testing
+    env: stable
   ports:
     - protocol: TCP
       port: 80
@@ -14,26 +14,26 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: homealone-testing
+  name: homealone
 spec:
   replicas: 1
   selector:
     matchLabels:
       name: homealone
-      env: testing
+      env: stable
   template:
     metadata:
       labels:
         name: homealone
         app: homealone
-        env: testing
+        env: stable
     spec:
       containers:
         - name: homealone
           image: pochemuto/homealone:v8
           env:
             - name: SPRING_PROFILES_ACTIVE
-              value: testing
+              value: stable
             - name: MAIL_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -58,12 +58,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: homealone-secrets
-                  key: bot_testing_token
+                  key: bot_token
             - name: BOT_USERNAME
               valueFrom:
                 secretKeyRef:
                   name: homealone-secrets
-                  key: bot_testing_username
+                  key: bot_username
             - name: MARAFON_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -88,8 +88,8 @@ spec:
           configMap:
             name: homealone-config
             items:
-              - key: testing
-                path: application-testing.yml
+              - key: stable
+                path: application-stable.yml
         - name: homealone-secrets
           secret:
             secretName: homealone-secrets

@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: homealone
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+    - hosts:
+        - homealone.pochemuto.com
+        - homealone.test.pochemuto.com
+      secretName: homealone-letsencrypt-prod
+  rules:
+    - host: homealone.pochemuto.com
+      http:
+        paths:
+          - path: "/"
+            pathType: Prefix
+            backend:
+              serviceName: homealone
+              servicePort: 80
+    - host: homealone.test.pochemuto.com
+      http:
+        paths:
+          - path: "/"
+            pathType: Prefix
+            backend:
+              serviceName: homealone-testing
+              servicePort: 80
