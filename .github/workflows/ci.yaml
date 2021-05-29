@@ -1,4 +1,4 @@
-name: Deploy to aurora
+name: Deploy-testing
 
 on:
   push:

@@ -1,5 +1,6 @@
-Homealone
+Homealone 
 =========
+![build status](https://github.com/pochemuto/homealone/actions/workflows/gradle.yml/badge.svg)
 
 Локальный запуск
 ----------------

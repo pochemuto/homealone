@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: homealone
-          image: pochemuto/homealone:v8
+          image: pochemuto/homealone
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: stable
