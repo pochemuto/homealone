@@ -24,7 +24,7 @@ jobs:
           context: .
           push: true
           build-args: |
-            GITHUB_SHA
+            VERSION=${{ github.sha }}
           tags: |
             pochemuto/homealone:${{ github.sha }}
           

@@ -23,7 +23,7 @@ def getHash = {
 ext {
     set('springBootAdminVersion', '2.3.1')
     set('mongodb.version', '3.12.8')
-    set('git_hash', System.getenv("GITHUB_SHA") ?: getHash())
+    set('version', System.getenv("VERSION") ?: getHash())
 }
 
 application {

@@ -37,4 +37,4 @@ management:
         include: '*'
 
 application:
-  git-hash: ${ext.git_hash}
+  version: ${ext.version}

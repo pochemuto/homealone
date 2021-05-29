@@ -72,7 +72,7 @@ public class TelegramBot implements Receiver, IkeaListener {
     }
 
     private void version(Update update) {
-        var version = properties.getGitHash();
+        var version = properties.getVersion();
         if (version.startsWith("$")) {
             version = "<undefined>";
         }

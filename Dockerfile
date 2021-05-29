@@ -1,8 +1,8 @@
 FROM adoptopenjdk/openjdk16:alpine AS build
 WORKDIR workspace
 
-ARG GITHUB_SHA=default-sha
-ENV GITHUB_SHA=${GITHUB_SHA}
+ARG VERSION=no-version
+ENV VERSION=${VERSION}
 
 COPY gradle gradle
 COPY build.gradle .
