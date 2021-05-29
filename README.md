@@ -1,6 +1,8 @@
 Homealone 
 =========
-![build status](https://github.com/pochemuto/homealone/actions/workflows/gradle.yml/badge.svg)
+[![Build](https://github.com/pochemuto/homealone/actions/workflows/gradle.yml/badge.svg)](https://github.com/pochemuto/homealone/actions/workflows/gradle.yml)
+[![Deploy-testing](https://github.com/pochemuto/homealone/actions/workflows/ci.yaml/badge.svg)](https://github.com/pochemuto/homealone/actions/workflows/ci.yaml)
+[![Release](https://github.com/pochemuto/homealone/actions/workflows/release.yaml/badge.svg)](https://github.com/pochemuto/homealone/actions/workflows/release.yaml)
 
 Локальный запуск
 ----------------
