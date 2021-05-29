@@ -1,5 +1,6 @@
 secret.properties
 kube/secrets.yaml
+config/application-local.yml
 data/
 
 HELP.md

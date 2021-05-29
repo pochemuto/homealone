@@ -4,6 +4,20 @@ spring:
       host: localhost
       port: 27019
 
+  mail:
+    username:
+    password:
+    host:
+    port:
+
+bot:
+  token:
+  username:
+
+marafon:
+  login:
+  password:
+
 management:
   endpoints:
     web:

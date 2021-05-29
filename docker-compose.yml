@@ -1,48 +1,24 @@
 services:
-  home:
-    build: .
-    secrets:
-      - secret-properties
-    restart: on-failure
-    image: home:1
-    container_name: home
-    networks:
-      - spring-boot-admin
-      - homealone
-
   mongo:
     image: mongo:4.0-xenial
     restart: always
     volumes:
       - mongo:/data/db
-    networks:
-      - homealone
+    ports:
+      - 27019:27017
+
+  selenium:
+    image: selenium/standalone-chrome:88.0
+    restart: always
+    shm_size: 2gb
+    environment:
+      - SCREEN_WIDTH=831
+      - SCREEN_HEIGHT=1800
+      - SCREEN_DEPTH=24
+      - SCREEN_DPI=460
+    ports:
+      - 4444:4444
 
 volumes:
   mongo:
-    name: mongo-data
 
-secrets:
-  secret-properties:
-    # должны находиться на машине, на которой запущена docker-machine
-    file: /etc/pochemuto/homealone/secret.properties
-
-networks:
-  spring-boot-admin:
-    external: true
-
-  homealone:
-    name: homealone
-    enable_ipv6: true
-    driver: bridge
-    driver_opts:
-      com.docker.network.enable_ipv6: "true"
-    ipam:
-      driver: default
-      config:
-       - subnet: 172.16.238.0/24
-         gateway: 172.16.238.1
-         # нужно добавить в файрвол
-         # sudo ip6tables -t nat -A POSTROUTING -s 2001:1000:1000::/64 ! -o docker0 -j MASQUERADE
-       - subnet: 2001:1000:1000::/64
-         gateway: 2001:1000:1000::1

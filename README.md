@@ -29,7 +29,7 @@ marafon.password=[]
 ```
 6. Выполните в корне проекта:
 ```shell
-docker-compose -f docker-compose.local.yml up
+docker-compose -f docker-compose.yml up
 ```
 7. Создайте в Idea конфигурацию запуска HomealoneApplication. 
    Подразумевается, что установлена Intellij Idea Ultimate + Spring plugin + Lombok plugin (включены по-умолчанию)
