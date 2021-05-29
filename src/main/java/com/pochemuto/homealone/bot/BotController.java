@@ -2,6 +2,8 @@ package com.pochemuto.homealone.bot;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.pochemuto.homealone.spring.ApplicationProperties;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +20,10 @@ import org.telegram.telegrambots.meta.generics.WebhookBot;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 public class BotController implements Webhook {
+
+    private final ApplicationProperties applicationProperties;
 
     private final ConcurrentHashMap<String, WebhookBot> callbacks = new ConcurrentHashMap<>();
 
@@ -43,7 +48,7 @@ public class BotController implements Webhook {
 
     @GetMapping("/bot/ping")
     public String ping() {
-        return "ok";
+        return "pong, version " + applicationProperties.getVersion();
     }
 
     @GetMapping("/bot/update/{botPath}")
