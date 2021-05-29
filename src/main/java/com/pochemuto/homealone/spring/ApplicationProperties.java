@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApplicationProperties {
     private Scheduling scheduling;
+    private String gitHash;
 
     @Data
     public static class Scheduling {

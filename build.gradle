@@ -14,9 +14,16 @@ repositories {
     mavenCentral()
 }
 
+def getHash = {
+    def p1 = 'git rev-parse HEAD'.execute()
+    p1.waitFor()
+    return p1.text
+}
+
 ext {
     set('springBootAdminVersion', '2.3.1')
     set('mongodb.version', '3.12.8')
+    set('git_hash', getHash())
 }
 
 application {
@@ -25,6 +32,10 @@ application {
 
 java {
     modularity.inferModulePath = false
+}
+
+processResources {
+    expand(project.properties)
 }
 
 sourceSets {
@@ -53,7 +64,6 @@ task integrationTest(type: Test) {
 }
 
 tasks.withType(Test) {
-    environment "SECRET_PROPERTIES", "secret.properties"
     useJUnitPlatform()
 }
 

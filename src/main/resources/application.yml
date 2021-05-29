@@ -35,3 +35,6 @@ management:
     web:
       exposure:
         include: '*'
+
+application:
+  git-hash: ${ext.git_hash}

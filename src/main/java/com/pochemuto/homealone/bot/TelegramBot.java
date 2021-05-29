@@ -15,6 +15,7 @@ import com.pochemuto.homealone.ikea.IkeaChecker;
 import com.pochemuto.homealone.ikea.IkeaListener;
 import com.pochemuto.homealone.ikea.Item;
 import com.pochemuto.homealone.marafon.MarafonLocalScraper;
+import com.pochemuto.homealone.spring.ApplicationProperties;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,9 @@ public class TelegramBot implements Receiver, IkeaListener {
     @Autowired
     private MeterRegistry registry;
 
+    @Autowired
+    private ApplicationProperties properties;
+
     @Override
     public void onUpdateReceived(Update update) {
         registry.timer("bot.update").record(() -> {
@@ -59,11 +63,20 @@ public class TelegramBot implements Receiver, IkeaListener {
                 var text = update.getMessage().getText().toLowerCase().strip();
                 switch (text) {
                     case "/ikea", "/икея" -> ikea(update);
-                    case "ping" -> pong(update);
+                    case "/ping", "ping" -> pong(update);
+                    case "/version" -> version(update);
                     case "/marafon" -> marafon(update);
                 }
             }
         });
+    }
+
+    private void version(Update update) {
+        var version = properties.getGitHash();
+        if (version.startsWith("$")) {
+            version = "<undefined>";
+        }
+        sendMessage(update.getMessage().getChatId(), version);
     }
 
     private void marafon(Update update) {
