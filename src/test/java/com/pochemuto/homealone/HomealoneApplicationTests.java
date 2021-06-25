@@ -5,7 +5,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-@ActiveProfiles(Profile.TEST)
+@ActiveProfiles(Profiles.TEST)
 class HomealoneApplicationTests {
 
     @Test
