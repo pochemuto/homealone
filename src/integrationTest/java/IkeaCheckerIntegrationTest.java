@@ -2,7 +2,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.pochemuto.homealone.HomealoneApplication;
-import com.pochemuto.homealone.Profile;
+import com.pochemuto.homealone.Profiles;
 import com.pochemuto.homealone.ikea.IkeaChecker;
 import com.pochemuto.homealone.ikea.Item;
 import com.pochemuto.homealone.ikea.ItemRepository;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest(classes = HomealoneApplication.class)
-@ActiveProfiles(Profile.INTEGRATION_TEST)
+@ActiveProfiles(Profiles.INTEGRATION_TEST)
 class IkeaCheckerIntegrationTest {
 
     @Autowired

@@ -2,6 +2,9 @@ application:
     scheduling:
         enabled: false
 
+telegrambots:
+    enabled: false
+
 spring:
     boot:
         admin:
