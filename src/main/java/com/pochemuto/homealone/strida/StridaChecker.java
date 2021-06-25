@@ -31,23 +31,30 @@ public class StridaChecker {
     private StridaItemRepository repository;
 
     @Scheduled(fixedDelay = 30 * 60 * 1000)
-    public void check() {
+    public void check() throws IOException {
+        log.info("Checking strida...");
+        processChanges(changes -> {
+            if (changes.areEqual()) {
+                log.info("No changes");
+                return;
+            }
+        });
     }
 
-    public void changes(Consumer<MapDifference<Integer, Item>> processor) throws IOException {
-        Map<Integer, Item> known = repository.findAll().stream()
-                .collect(Collectors.toMap(Item::id, identity()));
+    public void processChanges(Consumer<MapDifference<Integer, Bike>> processor) throws IOException {
+        Map<Integer, Bike> known = repository.findAll().stream()
+                .collect(Collectors.toMap(Bike::id, identity()));
         log.info("Known {} items", known.size());
-        Map<Integer, Item> actual = getActual().stream()
-                .collect(Collectors.toMap(Item::id, identity()));
+        Map<Integer, Bike> actual = getActual().stream()
+                .collect(Collectors.toMap(Bike::id, identity()));
         log.info("Actual {} items", actual.size());
 
-        MapDifference<Integer, Item> difference = Maps.difference(known, actual);
+        MapDifference<Integer, Bike> difference = Maps.difference(known, actual);
         processor.accept(difference);
         repository.saveAll(actual.values());
     }
 
-    public List<Item> getActual() throws IOException {
+    public List<Bike> getActual() throws IOException {
         Document document = Jsoup.connect("https://strida.ru/catalog/").get();
         Elements blocks = document.select(".catalog_block");
         return blocks.stream()
@@ -55,18 +62,18 @@ public class StridaChecker {
                 .toList();
     }
 
-    public static Item parseBlock(Element block) {
+    public static Bike parseBlock(Element block) {
         var link = block.selectFirst("h3 > a");
         var description = block.selectFirst("h4").text();
         var price = Integer.parseInt(block.selectFirst(".price").text().split(" ")[0]);
         var availability = block.selectFirst(".availability").text();
 
-        return new Item(
+        return new Bike(
                 extractId(link.attr("href")),
-                link.text(),
-                description,
+                link.text().strip(),
+                description.strip(),
                 price,
-                availability
+                availability.strip()
         );
     }
 

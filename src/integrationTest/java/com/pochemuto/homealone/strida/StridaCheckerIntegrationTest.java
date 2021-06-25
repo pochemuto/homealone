@@ -23,18 +23,18 @@ class StridaCheckerIntegrationTest {
     void actual() throws IOException {
         var actual = checker.getActual();
         assertThat(actual).isNotEmpty();
-        assertThat(actual).extracting(Item::title).doesNotContainNull();
-        assertThat(actual).extracting(Item::description).doesNotContainNull();
-        assertThat(actual).extracting(Item::availability).doesNotContainNull();
-        assertThat(actual).extracting(Item::price)
+        assertThat(actual).extracting(Bike::title).doesNotContainNull();
+        assertThat(actual).extracting(Bike::description).doesNotContainNull();
+        assertThat(actual).extracting(Bike::availability).doesNotContainNull();
+        assertThat(actual).extracting(Bike::price)
                 .allMatch(price -> price > 25000)
                 .allMatch(price -> price < 90000);
     }
 
     @Test
     void changes() throws IOException {
-        var result = new AtomicReference<MapDifference<Integer, Item>>();
-        checker.changes(result::set);
+        var result = new AtomicReference<MapDifference<Integer, Bike>>();
+        checker.processChanges(result::set);
 
         assertThat(result.get().entriesInCommon()).isEmpty();
         assertThat(result.get().entriesDiffering()).isEmpty();
@@ -43,7 +43,7 @@ class StridaCheckerIntegrationTest {
 
         var newItems = result.get().entriesOnlyOnRight();
 
-        checker.changes(result::set);
+        checker.processChanges(result::set);
 
         assertThat(result.get().entriesInCommon()).isEqualTo(newItems);
         assertThat(result.get().entriesDiffering()).isEmpty();

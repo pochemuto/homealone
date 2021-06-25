@@ -16,6 +16,8 @@ import com.pochemuto.homealone.ikea.IkeaListener;
 import com.pochemuto.homealone.ikea.Item;
 import com.pochemuto.homealone.marafon.MarafonLocalScraper;
 import com.pochemuto.homealone.spring.ApplicationProperties;
+import com.pochemuto.homealone.strida.Bike;
+import com.pochemuto.homealone.strida.StridaChecker;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,10 +53,14 @@ public class TelegramBot implements Receiver, IkeaListener {
     private MarafonLocalScraper marafonLocalScraper;
 
     @Autowired
+    private StridaChecker strida;
+
+    @Autowired
     private MeterRegistry registry;
 
     @Autowired
     private ApplicationProperties properties;
+
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -66,9 +72,36 @@ public class TelegramBot implements Receiver, IkeaListener {
                     case "/ping", "ping" -> pong(update);
                     case "/version" -> version(update);
                     case "/marafon" -> marafon(update);
+                    case "/strida" -> strida(update);
                 }
             }
         });
+    }
+
+    private void strida(Update update) {
+        try {
+            var actual = strida.getActual();
+            var sb = new StringBuilder("Велики:");
+            for (Bike bike : actual) {
+                sb.append("\n🚲 [").append(bike.title()).append("]")
+                        .append("(https://strida.ru/catalog/?id=").append(bike.id()).append(")")
+                        .append(", ")
+                        .append(bike.description())
+                        .append(" `").append(bike.price()).append(" руб`")
+                        .append(" • ").append(bike.availability());
+            }
+
+            messageSender.execute(SendMessage.builder()
+                    .chatId(String.valueOf(update.getMessage().getChatId()))
+                    .parseMode("markdown")
+                    .disableWebPagePreview(true)
+                    .text(sb.toString())
+                    .build()
+            );
+
+        } catch (IOException | TelegramApiException e) {
+            handleError(update.getMessage().getChatId(), e);
+        }
     }
 
     private void version(Update update) {

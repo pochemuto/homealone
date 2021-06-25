@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public record Item(
+public record Bike(
         @Id Integer id,
         String title,
         String description,
