@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk16:alpine AS build
+FROM openjdk:17-alpine AS build
 WORKDIR workspace
 
 ARG VERSION=no-version
@@ -14,7 +14,7 @@ COPY src src
 RUN ./gradlew installBootDist
 RUN java -Djarmode=layertools -jar build/libs/*.jar extract
 
-FROM adoptopenjdk/openjdk16:alpine
+FROM openjdk:17-alpine
 
 RUN apk add -U tzdata \
     && cp /usr/share/zoneinfo/Europe/Moscow /etc/localtime \
