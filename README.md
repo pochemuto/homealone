@@ -25,10 +25,6 @@ spring.mail.password=[пароль]
 # настройки бота
 bot.token=[токен бота]
 bot.username=[имя бота]
-
-# логин и пароль от http://lk.lerchekmarafon.ru
-marafon.login=[]
-marafon.password=[]
 ```
 6. Выполните в корне проекта:
 ```shell

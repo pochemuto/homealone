@@ -14,10 +14,6 @@ bot:
   token:
   username:
 
-marafon:
-  login:
-  password:
-
 management:
   endpoints:
     web:
