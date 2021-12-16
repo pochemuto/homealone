@@ -64,11 +64,6 @@ spec:
                 secretKeyRef:
                   name: homealone-secrets
                   key: bot_testing_username
-            - name: MARAFON_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: homealone-secrets
-                  key: marafon_password
 
           ports:
             - containerPort: 8080
