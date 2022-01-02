@@ -20,6 +20,10 @@ RUN apk add -U tzdata \
     && cp /usr/share/zoneinfo/Europe/Moscow /etc/localtime \
     && echo "Europe/Moscow" >  /etc/timezone
 
+ARG CERT="YandexCA.crt"
+COPY $CERT .
+RUN keytool -importcert -file $CERT -alias $CERT -cacerts -storepass changeit -noprompt
+
 COPY --from=build workspace/dependencies/ .
 COPY --from=build workspace/snapshot-dependencies/ .
 COPY --from=build workspace/spring-boot-loader/ .
