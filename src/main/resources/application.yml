@@ -12,10 +12,6 @@ spring:
       client:
         url: http://spring-boot-admin:8283
 
-  data:
-    mongodb:
-      host: mongo
-
   mail:
     properties:
       mail:
