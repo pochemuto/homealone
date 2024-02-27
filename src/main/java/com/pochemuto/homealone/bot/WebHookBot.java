@@ -1,12 +1,14 @@
 package com.pochemuto.homealone.bot;
 
+import java.util.List;
 import java.util.Objects;
 
-import javax.annotation.PostConstruct;
-
 import com.google.common.base.Preconditions;
+
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -18,8 +20,9 @@ public class WebHookBot extends SpringWebhookBot {
     @Autowired
     private BotProperties properties;
 
+    @Lazy
     @Autowired
-    private Receiver receiver;
+    private List<Receiver> receivers;
 
     public WebHookBot(String webhookUrl) {
         super(SetWebhook.builder()
@@ -31,10 +34,10 @@ public class WebHookBot extends SpringWebhookBot {
     public void postConstruct() {
         log.info("Registering as webhook bot {} with token {}",
                 getBotUsername(),
-                Objects.requireNonNullElse(getBotToken(), "null").substring(0, 4)
-        );
+                Objects.requireNonNullElse(getBotToken(), "null").substring(0, 4));
     }
-    //region Settings
+
+    // region Settings
     @Override
     public String getBotUsername() {
         return properties.getUsername();
@@ -49,12 +52,14 @@ public class WebHookBot extends SpringWebhookBot {
     public String getBotPath() {
         return properties.getWebhookPath();
     }
-    //endregion
+    // endregion
 
     @Override
     @SuppressWarnings("rawtypes")
     public BotApiMethod onWebhookUpdateReceived(Update update) {
-        receiver.onUpdateReceived(update);
+        for (Receiver receiver : receivers) {
+            receiver.onUpdateReceived(update);
+        }
         return null;
     }
 }

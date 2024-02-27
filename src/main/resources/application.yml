@@ -1,8 +1,3 @@
-cache:
-  ikea:
-    expire: 2m
-
-
 spring:
   application:
     name: Homealone

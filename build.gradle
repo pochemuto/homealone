@@ -1,6 +1,6 @@
 plugins {
-    id 'org.springframework.boot' version '2.4.2'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'org.springframework.boot' version '3.2.3'
+    id 'io.spring.dependency-management' version '1.1.4'
     id 'application'
     id 'idea'
 }
@@ -9,6 +9,12 @@ group = 'com.pochemuto'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
+
+configurations {
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
+}
 
 repositories {
     mavenCentral()
@@ -21,8 +27,8 @@ def getHash = {
 }
 
 ext {
-    set('springBootAdminVersion', '2.3.1')
-    set('mongodb.version', '3.12.8')
+    set('springBootAdminVersion', '3.2.2')
+    set('mongodb.version', '4.2.3')
     set('version', System.getenv("VERSION") ?: getHash())
 }
 
@@ -96,10 +102,8 @@ dependencies {
     implementation 'org.seleniumhq.selenium:selenium-java:3.141.59'
     implementation group: 'ru.yandex.qatools.ashot', name: 'ashot', version: '1.5.4'
 
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
-
     // lombok
-    def lombokVersion = '1.18.20'
+    def lombokVersion = '1.18.30'
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
